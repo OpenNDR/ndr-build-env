@@ -1,0 +1,48 @@
+List of ndr-build-env maintainers
+
+Descriptions of section entries:
+
+	M: Maintainer's Full Name <address@domain>
+	T: Git Tree location | Branch | Tag
+	C: Classfication that is relevant to this.
+	S: Status, one of the following:
+		Supported:	Someone is actually paid to look after this.
+		Maintained:	Someone actually looks after it.
+		Broken:		It has maintainer but they don't have time to fix issues.
+		Deprecated:	Old code. It replaced by a better system and you should be using that.
+		Orphan:		No current maintainer.
+
+	F: Files and directories with wildcard patterns.
+		A trailing slash includes all files and subdirectory files.
+		F:	arch/x86/     all files in and below arch/x86
+		F:	arch/x86/*    all files in arch/x86, but not below
+		F:	*/arch/*      all files in "any top level directory"/arch
+		One pattern per line.  Multiple F: lines acceptable.
+	X: Files and directories exclusion, same rules as F:
+	K: Keyword regex pattern to match content.
+		One regex pattern per line. Multiple K: lines acceptable.
+
+Stable Branch
+T: https://github.com/OpenNDR/ndr-build-env.git | master | v1.0.0-rc1
+
+== General ==
+Project Administration
+M:  Hyeonho Seo <seohho@gmail.com>
+C:  common
+S:  Maintained
+F:  .gitignore
+F:  README.md
+F:  LICENSE
+F:  MAINTAINERS
+
+== Build system ==
+M:  Hyeonho Seo <seohho@gmail.com>
+C:  build
+S:  Maintained
+F:  ndr.*
+
+== NDR test subcomponent ==
+M:  Hyeonho Seo <seohho@gmail.com>
+C:  nts
+S:  Maintained
+F:  ndr.test.subcomp/
