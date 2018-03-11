@@ -19,8 +19,8 @@ $(HDRS):
 $(EXTOBJS):
 	$(eval LNKLIST += $(wildcard  $(NBE_MK_OBJPATH)/$@/*.o))
 
-$(INCS):
-	@cp -f $(SRCDIR)/$@ $(NBE_INCPATH)
+$(INCHDR):
+	@cp -f $(SRCDIR)/$@ $(NBE_INCPATH)/$(LIB).h
 
 $(SRCS):
 	@gcc -c $(SRCDIR)/$@ -I$(NBE_INCPATH) -I$(NBE_MK_INCPATH) $(CFLAGS) $(EXTRA_CFLAGS)
