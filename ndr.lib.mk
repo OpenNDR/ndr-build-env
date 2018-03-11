@@ -1,7 +1,7 @@
 SRCDIR := $(NBE_ROOT)/$S
 
 .PHONY: build
-build: $(HDRS) $(EXTOBJS) $(SRCS) lklib
+build: $(HDRS) $(EXTOBJS) $(INCS) $(SRCS) lklib
 
 .PHONY: depset
 depset: mkdir $(HDRS)
@@ -14,10 +14,13 @@ mkdir:
 	@[ -d $(NBE_LIBPATH) ] || mkdir -p $(NBE_LIBPATH)
 
 $(HDRS):
-	@cp -f $(SRCDIR)/$@ $(NBE_OUTPUT)/include
+	@cp -f $(SRCDIR)/$@ $(NBE_MK_INCPATH)
 
 $(EXTOBJS):
 	$(eval LNKLIST += $(wildcard  $(NBE_MK_OBJPATH)/$@/*.o))
+
+$(INCS):
+	@cp -f $(SRCDIR)/$@ $(NBE_INCPATH)
 
 $(SRCS):
 	@gcc -c $(SRCDIR)/$@ -I$(NBE_INCPATH) -I$(NBE_MK_INCPATH) $(CFLAGS) $(EXTRA_CFLAGS)
