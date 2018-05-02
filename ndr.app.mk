@@ -7,7 +7,7 @@ build: $(DEPLIBS) $(EXTOBJS) $(SRCS) lkapp mvapp
 .PHONY: depset
 depset: mkdir $(HDRS)
 
-mkdir:
+mkdir::
 	#Output directories pre-init
 	@[ -d $(NBE_DBGPATH) ] || mkdir -p $(NBE_DBGPATH)
 	@[ -d $(NBE_INCPATH) ] || mkdir -p $(NBE_INCPATH)
@@ -15,6 +15,8 @@ mkdir:
 	@[ -d $(NBE_MK_OBJPATH) ] || mkdir -p $(NBE_MK_OBJPATH)
 	@[ -d $(NBE_LIBPATH) ] || mkdir -p $(NBE_LIBPATH)
 	@[ -d $(NBE_APPPATH) ] || mkdir -p $(NBE_APPPATH)
+
+$(HDRS):: ;
 
 $(DEPLIBS):
 	$(eval LIBLIST += $(addprefix -l,$@))
