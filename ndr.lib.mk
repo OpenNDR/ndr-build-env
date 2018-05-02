@@ -6,7 +6,7 @@ build: $(HDRS) $(EXTOBJS) $(SRCS) $(INCS) lklib
 .PHONY: depset
 depset: mkdir $(HDRS)
 
-mkdir:
+mkdir::
 	#Output directories pre-init
 	@[ -d $(NBE_DBGPATH) ] || mkdir -p $(NBE_DBGPATH)
 	@[ -d $(NBE_INCPATH) ] || mkdir -p $(NBE_INCPATH)
@@ -14,7 +14,7 @@ mkdir:
 	@[ -d $(NBE_MK_LOBJPATH) ] || mkdir -p $(NBE_MK_LOBJPATH)
 	@[ -d $(NBE_LIBPATH) ] || mkdir -p $(NBE_LIBPATH)
 
-$(HDRS):
+$(HDRS)::
 	@cp -f $(SRCDIR)/$@ $(NBE_MK_INCPATH)
 
 $(EXTOBJS):
