@@ -6,12 +6,11 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MPL--2.0-green.svg)](https://opensource.org/licenses/MPL-2.0)
 [![Release: 1.1.1](https://img.shields.io/badge/release-v1.1.1-blue.svg)](https://github.com/openndr/ndr-build-env/releases/tag/v1.1.1)
-[![Stable: 1.0.0](https://img.shields.io/badge/stable-v1.0.0-blue.svg)](https://github.com/openndr/ndr-build-env/releases/tag/v1.0.0)
 
 ## Latest Release
-### 1.1.0
-- [Release](https://github.com/openndr/ndr-build-env/releases/tag/v1.1.0)
-- [Change Log](https://github.com/openndr/ndr-build-env/milestone/2)
+### 1.1.1
+- [Release](https://github.com/openndr/ndr-build-env/releases/tag/v1.1.1)
+- [Change Log](https://github.com/openndr/ndr-build-env/milestone/4)
 
 ## Features
 * Set of 'Makefile' build scripts
