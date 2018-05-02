@@ -7,19 +7,21 @@ obj-m := $(KMOD).o
 $(KMOD)-objs := $(SRCS:.c=.o) $(ASMS:.S=.o)
 
 .PHONY: build
-build: $(HDRS) mkkmod mvkmod
+build: $(HDRS) $(SRCS) mkkmod mvkmod
 
 .PHONY: depset
 depset: mkdir $(HDRS)
 
-mkdir:
+mkdir::
 	#Output directories pre-init
 	@[ -d $(NBE_MK_INCPATH) ] || mkdir -p $(NBE_MK_INCPATH)
 	@[ -d $(NBE_MK_KBUILDPATH) ] || mkdir -p $(NBE_MK_KBUILDPATH)
 	@[ -d $(NBE_KMODPATH) ] || mkdir -p $(NBE_KMODPATH)
 
-$(HDRS):
+$(HDRS)::
 	@cp -f $(SRCDIR)/$@ $(NBE_MK_INCPATH)
+
+$(SRCS):: ;
 
 mkkmod:
 	@cp -r $(SRCDIR) $(NBE_MK_KBUILDPATH)/$(KMOD)

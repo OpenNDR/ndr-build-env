@@ -8,11 +8,10 @@ depset: mkdir $(HDRS)
 
 mkdir::
 	#Output directories pre-init
-	@[ -d $(NBE_DBGPATH) ] || mkdir -p $(NBE_DBGPATH)
-	@[ -d $(NBE_INCPATH) ] || mkdir -p $(NBE_INCPATH)
 	@[ -d $(NBE_MK_INCPATH) ] || mkdir -p $(NBE_MK_INCPATH)
 	@[ -d $(NBE_MK_OBJPATH) ] || mkdir -p $(NBE_MK_OBJPATH)
 	@[ -d $(NBE_MK_OBJPATH)/$(OBJ) ] || mkdir -p $(NBE_MK_OBJPATH)/$(OBJ)
+	@[ -d $(NBE_INCPATH) ] || mkdir -p $(NBE_INCPATH)
 
 $(HDRS)::
 	@cp -f $(SRCDIR)/$@ $(NBE_MK_INCPATH)

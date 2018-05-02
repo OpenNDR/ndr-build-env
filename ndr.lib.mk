@@ -8,10 +8,9 @@ depset: mkdir $(HDRS)
 
 mkdir::
 	#Output directories pre-init
-	@[ -d $(NBE_DBGPATH) ] || mkdir -p $(NBE_DBGPATH)
-	@[ -d $(NBE_INCPATH) ] || mkdir -p $(NBE_INCPATH)
 	@[ -d $(NBE_MK_INCPATH) ] || mkdir -p $(NBE_MK_INCPATH)
 	@[ -d $(NBE_MK_LOBJPATH) ] || mkdir -p $(NBE_MK_LOBJPATH)
+	@[ -d $(NBE_INCPATH) ] || mkdir -p $(NBE_INCPATH)
 	@[ -d $(NBE_LIBPATH) ] || mkdir -p $(NBE_LIBPATH)
 
 $(HDRS)::
