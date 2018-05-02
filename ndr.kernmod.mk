@@ -4,7 +4,9 @@ KVER ?= $(shell uname -r)
 KDIR := /lib/modules/$(KVER)/build
 EXTRA_CFLAGS += -I$(NBE_MK_INCPATH)
 obj-m := $(KMOD).o
-$(KMOD)-objs := $(SRCS:.c=.o) $(ASMS:.S=.o)
+SRCS_EXT_C := $(SRCS:.c=.o)
+SRCS_EXT_CC := $(SRCS_EXT_C:.cc=.o)
+$(KMOD)-objs := $(SRCS_EXT_CC) $(ASMS:.S=.o)
 
 .PHONY: build
 build: $(HDRS) $(SRCS) mkkmod mvkmod
