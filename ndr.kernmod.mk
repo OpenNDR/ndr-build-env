@@ -9,7 +9,7 @@ SRCS_EXT_CC := $(SRCS_EXT_C:.cc=.o)
 $(KMOD)-objs := $(SRCS_EXT_CC) $(ASMS:.S=.o)
 
 .PHONY: build
-build: $(HDRS) $(SRCS) mkkmod mvkmod
+build: $(SRCS) mkkmod mvkmod
 
 .PHONY: depset
 depset: mkdir $(HDRS)
@@ -21,6 +21,7 @@ mkdir::
 	@[ -d $(NBE_KMODPATH) ] || mkdir -p $(NBE_KMODPATH)
 
 $(HDRS)::
+	@echo $@:$(SRCDIR):$(NBE_MK_INCPATH) >> $(NBE_LOG_PATHLOG)
 	@cp -f $(SRCDIR)/$@ $(NBE_MK_INCPATH)
 
 $(SRCS):: ;

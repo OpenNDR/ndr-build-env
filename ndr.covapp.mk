@@ -14,10 +14,11 @@ build: $(DEPLIBS) $(SRCS) buildlist buildtest gencov
 depset: mkdir $(HDRS)
 
 mkdir::
-	@[ -d $(NBE_MK_INCPATH) ] || mkdir -p $(NBE_MK_INCPATH)
 	@[ -d $(NBE_APPPATH) ] || mkdir -p $(NBE_APPPATH)
 
-$(HDRS):: ;
+$(HDRS)::
+	@echo $@:$(SRCDIR):$(NBE_MK_INCPATH) >> $(NBE_LOG_PATHLOG)
+	@cp -f $(SRCDIR)/$@ $(NBE_MK_INCPATH)
 
 $(DEPLIBS):
 	$(eval LIBLIST += $(addprefix -l,$@))
@@ -37,3 +38,4 @@ gencov:
 	@./$(COVAPP)_cov $(TESTARGS)
 	@gcov $(BUILDLIST) -o .
 	@mv -f *.gcov $(NBE_COVPATH)
+	@$(NBE_SCRIPTS)/restore_source.sh $(NBE_LOG_PATHLOG) $(NBE_COVPATH)

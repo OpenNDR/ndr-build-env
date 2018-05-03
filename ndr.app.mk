@@ -15,7 +15,9 @@ mkdir::
 	@[ -d $(NBE_LIBPATH) ] || mkdir -p $(NBE_LIBPATH)
 	@[ -d $(NBE_APPPATH) ] || mkdir -p $(NBE_APPPATH)
 
-$(HDRS):: ;
+$(HDRS)::
+	@echo $@:$(SRCDIR):$(NBE_MK_INCPATH) >> $(NBE_LOG_PATHLOG)
+	@cp -f $(SRCDIR)/$@ $(NBE_MK_INCPATH)
 
 $(DEPLIBS):
 	$(eval LIBLIST += $(addprefix -l,$@))

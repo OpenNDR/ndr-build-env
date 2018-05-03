@@ -2,6 +2,8 @@ NBE_ROOT = $(CURDIR)
 export NBE_ROOT
 NBE_DIR = $(NBE_ROOT)/ndr-build-env
 export NBE_DIR
+NBE_SCRIPTS = $(NBE_DIR)/ndr.build.script
+export NBE_SCRIPTS
 
 include $(NBE_DIR)/ndr.pathconf.mk
 include $(NBE_DIR)/ndr.libconf.mk
