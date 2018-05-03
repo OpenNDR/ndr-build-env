@@ -29,11 +29,11 @@ buildlist:
 	$(eval BUILDLIST += $(wildcard $(NBE_MK_COVPATH)/*.cc))
 
 buildtest:
-	@gcc -coverage -o $(TESTAPP)_cov $(BUILDLIST) -I$(SRCDIR) -I$(NBE_MK_INCPATH) -L$(NBE_LIBPATH) $(LIBLIST) $(NBE_LIBS) $(CFLAGS) $(EXTRA_CFLAGS)
-	@gcc -o $(TESTAPP) $(BUILDLIST) -I$(SRCDIR) -I$(NBE_MK_INCPATH) -L$(NBE_LIBPATH) $(LIBLIST) $(NBE_LIBS) $(CFLAGS) $(EXTRA_CFLAGS)
+	@gcc -coverage -o $(COVAPP)_cov $(BUILDLIST) -I$(SRCDIR) -I$(NBE_MK_INCPATH) -L$(NBE_LIBPATH) $(LIBLIST) $(NBE_LIBS) $(CFLAGS) $(EXTRA_CFLAGS)
+	@gcc -o $(COVAPP) $(BUILDLIST) -I$(SRCDIR) -I$(NBE_MK_INCPATH) -L$(NBE_LIBPATH) $(LIBLIST) $(NBE_LIBS) $(CFLAGS) $(EXTRA_CFLAGS)
 
 gencov:
-	@mv -f $(TESTAPP) $(NBE_APPPATH)
-	@./$(TESTAPP)_cov $(TESTARGS)
+	@mv -f $(COVAPP) $(NBE_APPPATH)
+	@./$(COVAPP)_cov $(TESTARGS)
 	@gcov $(BUILDLIST) -o .
 	@mv -f *.gcov $(NBE_COVPATH)
