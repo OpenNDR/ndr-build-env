@@ -41,6 +41,12 @@ C:  build
 S:  Maintained
 F:  ndr.*
 
+== Build scripts ==
+M:  Hyeonho Seo <seohho@gmail.com>
+C:  nbs
+S:  Maintained
+F:  ndr.build.script/
+
 == NDR test subcomponent ==
 M:  Hyeonho Seo <seohho@gmail.com>
 C:  nts
