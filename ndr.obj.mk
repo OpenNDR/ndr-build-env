@@ -1,7 +1,7 @@
 SRCDIR := $(NBE_ROOT)/$S
 
 .PHONY: build
-build: $(HDRS) $(SRCS)
+build: $(SRCS)
 
 .PHONY: depset
 depset: mkdir $(HDRS)
@@ -14,6 +14,7 @@ mkdir::
 	@[ -d $(NBE_INCPATH) ] || mkdir -p $(NBE_INCPATH)
 
 $(HDRS)::
+	@echo $@:$(SRCDIR):$(NBE_MK_INCPATH) >> $(NBE_LOG_PATHLOG)
 	@cp -f $(SRCDIR)/$@ $(NBE_MK_INCPATH)
 
 $(SRCS)::
