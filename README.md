@@ -17,6 +17,7 @@
     * Application build             (ndr.app.mk)
     * Static Library build          (ndr.lib.mk)
     * Linux Kernel module build     (ndr.kernmod.mk)
+	* Coverage report build			(ndr.covapp.mk)
     * Object based modulize build   (ndr.obj.mk)
     * Subdirectory build            (ndr.subdir.mk)
 * NDR Test subcomponent (inspired by [Catch2](https://github.com/catchorg/Catch2))
