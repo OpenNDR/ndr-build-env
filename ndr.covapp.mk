@@ -8,7 +8,7 @@ CFLAGS += -O0
 CFLAGS += -g
 
 .PHONY: build
-build: $(DEPLIBS) $(SRCS) buildlist buildtest gencov
+build: $(DEPLIBS) $(SRCS) buildlist buildtest gencov delcov mvcov
 
 .PHONY: depset
 depset: mkdir $(HDRS)
@@ -37,5 +37,12 @@ gencov:
 	@mv -f $(COVAPP) $(NBE_APPPATH)
 	@./$(COVAPP)_cov $(TESTARGS)
 	@gcov $(BUILDLIST) -o .
+
+delcov:
+	$(eval EXCEPTLIST += $(basename $(SRCS)))
+	$(eval EXCEPTLIST += nts)
+	$(foreach except, $(EXCEPTLIST), @rm -f $(except).* )
+
+mvcov:
 	@mv -f *.gcov $(NBE_COVPATH)
 	@$(NBE_SCRIPTS)/restore_source.sh $(NBE_LOG_PATHLOG) $(NBE_COVPATH)
