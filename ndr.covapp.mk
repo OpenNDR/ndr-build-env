@@ -41,7 +41,7 @@ gencov:
 delcov:
 	$(eval EXCEPTLIST += $(basename $(SRCS)))
 	$(eval EXCEPTLIST += nts)
-	$(foreach except, $(EXCEPTLIST), @rm -f $(except).* )
+	$(foreach EXCEPT_ITER, $(EXCEPTLIST), @rm -f $(EXCEPT_ITER).*)
 
 mvcov:
 	@mv -f *.gcov $(NBE_COVPATH)
