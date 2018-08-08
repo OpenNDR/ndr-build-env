@@ -4,12 +4,19 @@ KVER ?= $(shell uname -r)
 KDIR := /lib/modules/$(KVER)/build
 EXTRA_CFLAGS += -I$(NBE_MK_INCPATH)
 obj-m := $(KMOD).o
-SRCS_EXT_C := $(SRCS:.c=.o)
-SRCS_EXT_CC := $(SRCS_EXT_C:.cc=.o)
-$(KMOD)-objs := $(SRCS_EXT_CC) $(ASMS:.S=.o)
+ifneq ($(origin KEXTS), undefined)
+	KEXT_DIRS += $(foreach KEXT_ITER, $(KEXTS), $(NBE_MK_KEXTPATH)/$(KEXT_ITER)/)
+	KEXT_SRCS += $(foreach KEXT_ITER, $(KEXT_DIRS), $(shell ls $(KEXT_ITER)))
+	SRCS_ORG := $(SRCS)
+	SRCS = $(KEXT_SRCS)
+	SRCS += $(SRCS_ORG)
+endif
+SRCS_C := $(SRCS:.c=.o)
+SRCS_CC := $(SRCS_C:.cc=.o)
+$(KMOD)-objs := $(SRCS_CC) $(ASMS:.S=.o)
 
 .PHONY: build
-build: $(SRCS) mkkmod mvkmod
+build: $(KEXTS) $(SRCS) mkkmod mvkmod
 
 .PHONY: depset
 depset: mkdir $(HDRS)
@@ -24,10 +31,15 @@ $(HDRS)::
 	@echo $@:$(SRCDIR):$(NBE_MK_INCPATH) >> $(NBE_LOG_PATHLOG)
 	@cp -f $(SRCDIR)/$@ $(NBE_MK_INCPATH)
 
+$(KEXTS)::
+	@[ -d $(NBE_MK_KBUILDPATH)/$(KMOD) ] || mkdir -p $(NBE_MK_KBUILDPATH)/$(KMOD)
+	@cp -f $(NBE_MK_KEXTPATH)/$@/* $(NBE_MK_KBUILDPATH)/$(KMOD)
+
 $(SRCS):: ;
 
 mkkmod:
-	@cp -r $(SRCDIR) $(NBE_MK_KBUILDPATH)/$(KMOD)
+	@[ -d $(NBE_MK_KBUILDPATH)/$(KMOD) ] || mkdir -p $(NBE_MK_KBUILDPATH)/$(KMOD)
+	@cp -rf $(SRCDIR)/* $(NBE_MK_KBUILDPATH)/$(KMOD)
 	$(MAKE) -C $(KDIR) M=$(NBE_MK_KBUILDPATH)/$(KMOD) modules
 	@ln -s $(NBE_MK_KBUILDPATH)/$(KMOD) kbuilt-$(KMOD)
 
