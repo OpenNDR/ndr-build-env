@@ -37,9 +37,4 @@ B. License notice:
 L:	The MIT License
 E:	LICENSE-MIT
 F:	/
-X:	drivers/
 
-== Linux Driver Commons ==
-L:	GNU General Public License version 3
-E:	LICENSE-GPL
-F:	drivers/
