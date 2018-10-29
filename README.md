@@ -4,7 +4,7 @@
 
 'ndr-build-env' is a sub-component of 'ndrte' framework, that is the set of makefile scripts for software development easier.
 
-[![License: MIT](https://img.shields.io/badge/License-MPL--2.0-green.svg)](https://opensource.org/licenses/MPL-2.0)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Release: 1.2.2](https://img.shields.io/badge/release-v1.2.2-blue.svg)](https://github.com/openndr/ndr-build-env/releases/tag/v1.2.2)
 
 ## Latest Release
