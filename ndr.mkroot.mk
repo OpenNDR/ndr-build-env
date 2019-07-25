@@ -6,6 +6,7 @@ NBE_SCRIPTS = $(NBE_DIR)/ndr.build.script
 export NBE_SCRIPTS
 
 include $(NBE_DIR)/ndr.pathconf.mk
+include $(NBE_DIR)/ndr.dpdkconf.mk
 include $(NBE_DIR)/ndr.libconf.mk
 include $(NBE_DIR)/ndr.archtype.mk
 include $(NBE_DIR)/ndr.defset.mk
@@ -34,9 +35,9 @@ clean:
 
 .PHONY: $(RDIRS)
 $(RDIRS):
-	@[ -d $(NBE_OUTPUT)/$@ ] || mkdir -p $(NBE_OUTPUT)/$@
+	@[ -d $(NBE_OUTPUT)/$@ ] || mkdir -p $(NBE_BUILDPATH)/$@
 	@echo "== Build $@"
-	@$(MAKE) S=$@ -f $(NBE_ROOT)/$@/Makefile -C $(NBE_OUTPUT)/$@ build
+	@$(MAKE) S=$@ -f $(NBE_ROOT)/$@/Makefile -C $(NBE_BUILDPATH)/$@ build
 
 %_depset:
 	@echo "== Depset $*"
