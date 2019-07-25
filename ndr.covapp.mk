@@ -3,7 +3,7 @@ include $(NBE_DIR)/ndr.subcomp.mk
 include $(NBE_DIR)/ndr.coverage.mk
 
 SRCDIR := $(NBE_ROOT)/$S
-LDFLAGS += --as-needed
+LDFLAGS += --as-needed -ldl
 CFLAGS += -O0
 CFLAGS += -g
 
@@ -31,7 +31,7 @@ buildlist:
 
 buildtest:
 	@gcc -coverage -o $(COVAPP)_cov $(BUILDLIST) -I$(SRCDIR) -I$(NBE_MK_INCPATH) -L$(NBE_LIBPATH) $(LIBLIST) $(NBE_LIBS) $(CFLAGS) $(EXTRA_CFLAGS)
-	@gcc -o $(COVAPP) $(BUILDLIST) -I$(SRCDIR) -I$(NBE_MK_INCPATH) -L$(NBE_LIBPATH) $(LIBLIST) $(NBE_LIBS) $(CFLAGS) $(EXTRA_CFLAGS)
+	@gcc -o $(COVAPP) $(BUILDLIST) -I$(SRCDIR) -I$(NBE_MK_INCPATH) -L$(NBE_LIBPATH) $(NBE_LIBS) $(LIBLIST) $(CFLAGS) $(EXTRA_CFLAGS)
 
 gencov:
 	@mv -f $(COVAPP) $(NBE_APPPATH)
