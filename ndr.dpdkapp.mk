@@ -26,12 +26,14 @@ $(EXTOBJS):
 	$(eval EXTLIST += $(wildcard  $(NBE_MK_OBJPATH)/$@/*.o))
 
 $(SRCS)::
+	@[ -d $(NBE_DPDKPATH) ] && cp -r $(NBE_DPDKPATH)/include/* $(NBE_INCPATH)/.
 	@gcc -c $(SRCDIR)/$@ -I$(NBE_INCPATH) -I$(NBE_MK_INCPATH) $(CFLAGS) $(EXTRA_CFLAGS)
 	@cp -f $(basename $@).o  $(NBE_MK_OBJPATH)
 	$(eval SRCLIST += $(basename $@).o)
 
 lkapp:
-	@gcc -o $(APP) $(EXTLIST) $(SRCLIST) -L$(NBE_LIBPATH) $(NBE_LIBS) $(LIBLIST)
+	@[ -d $(NBE_DPDKPATH) ] && cp -r $(NBE_DPDKPATH)/lib/* $(NBE_LIBPATH)/.
+	@gcc -o $(DPDKAPP) $(EXTLIST) $(SRCLIST) -L$(NBE_LIBPATH) $(NBE_LIBS) $(LIBLIST)
 
 mvapp:
-	@mv -f $(APP) $(NBE_APPPATH)
+	@mv -f $(DPDKAPP) $(NBE_APPPATH)
