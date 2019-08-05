@@ -8,7 +8,7 @@ CFLAGS += -O0
 CFLAGS += -g
 
 .PHONY: build
-build: $(DEPLIBS) $(SRCS) buildlist buildtest gencov delcov mvcov
+build: $(DEPLIBS) $(SRCS) buildlist buildtest covlist gencov delcov mvcov
 
 .PHONY: depset
 depset: mkdir $(HDRS)
@@ -28,15 +28,22 @@ $(SRCS):: ;
 buildlist:
 	$(eval BUILDLIST += $(wildcard $(NBE_MK_COVPATH)/*.c))
 	$(eval BUILDLIST += $(wildcard $(NBE_MK_COVPATH)/*.cc))
+	$(eval BUILDLIST += $(wildcard $(NBE_MK_COVPATH)/*.s))
+	$(eval BUILDLIST += $(wildcard $(NBE_MK_COVPATH)/*.S))
+	$(eval BUILDLIST += $(wildcard $(NBE_MK_COVPATH)/*.asm))
 
 buildtest:
 	@gcc -coverage -o $(COVAPP)_cov $(BUILDLIST) -I$(SRCDIR) -I$(NBE_MK_INCPATH) -L$(NBE_LIBPATH) $(LIBLIST) $(NBE_LIBS) $(CFLAGS) $(EXTRA_CFLAGS)
 	@gcc -o $(COVAPP) $(BUILDLIST) -I$(SRCDIR) -I$(NBE_MK_INCPATH) -L$(NBE_LIBPATH) $(NBE_LIBS) $(LIBLIST) $(CFLAGS) $(EXTRA_CFLAGS)
 
+covlist:
+	$(eval COVLIST += $(wildcard $(NBE_MK_COVPATH)/*.c))
+	$(eval COVLIST += $(wildcard $(NBE_MK_COVPATH)/*.cc))
+
 gencov:
 	@mv -f $(COVAPP) $(NBE_APPPATH)
 	@./$(COVAPP)_cov $(TESTARGS)
-	@gcov $(BUILDLIST) -o .
+	@gcov $(COVLIST) -o .
 
 delcov:
 	$(eval EXCEPTLIST += $(basename $(SRCS)))
