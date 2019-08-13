@@ -31,7 +31,7 @@ $(SRCS)::
 	$(eval SRCLIST += $(basename $@).o)
 
 lkapp:
-	@gcc -o $(APP) $(EXTLIST) $(SRCLIST) -L$(NBE_LIBPATH) $(NBE_LIBS) $(LIBLIST)
+	@gcc -o $(APP).app $(EXTLIST) $(SRCLIST) -L$(NBE_LIBPATH) $(NBE_LIBS) $(LIBLIST)
 
 mvapp:
-	@mv -f $(APP) $(NBE_APPPATH)
+	@mv -f $(APP).app $(NBE_APPPATH)

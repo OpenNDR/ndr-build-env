@@ -33,7 +33,7 @@ $(SRCS)::
 
 lkapp:
 	@[ -d $(NBE_DPDKPATH) ] && cp -r $(NBE_DPDKPATH)/lib/* $(NBE_LIBPATH)/.
-	@gcc -o $(DPDKAPP) $(EXTLIST) $(SRCLIST) -L$(NBE_LIBPATH) $(NBE_LIBS) $(LIBLIST)
+	@gcc -o $(DPDKAPP).app $(EXTLIST) $(SRCLIST) -L$(NBE_LIBPATH) $(NBE_LIBS) $(LIBLIST)
 
 mvapp:
-	@mv -f $(DPDKAPP) $(NBE_APPPATH)
+	@mv -f $(DPDKAPP).app $(NBE_APPPATH)
