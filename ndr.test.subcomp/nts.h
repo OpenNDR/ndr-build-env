@@ -1,297 +1,274 @@
 #ifndef NDR_TEST_SUBCOMP
 #define NDR_TEST_SUBCOMP
 
+#ifdef __KERNEL__
+#include <linux/printk.h>
+#else /* __KERNEL__ */
 #include <stdio.h>
-#include <stdlib.h>
+#endif /* __KERNEL__ */
 
-#define NTS_INTERNAL_NULL                  (void *)0
+/**
+ * @def NTS_VALID
+ * 	Same as 0
+ */
+#define NTS_VALID 0
 
-#if defined     GNUC
-	#define nts_internal_forceinline		__attribute__((always_inline))
-	#define nts_internal_likely(x)			__builtin_expect((x),1)
-	#define nts_internal_unlikely(x)		__builtin_expect((x),0)
-	#define NTS_INTERNAL_CSTR_FILE			__FILE__
-	#define NTS_INTERNAL_CSTR_LINE			__LINE__
-	#define NTS_INTERNAL_CSTR_FUNC			__func__
-	#define NTS_INTERNAL_CSTR_COMPDATE		__DATE__
-	#define NTS_INTERNAL_CSTR_COMPTIME		__TIME__
-	#define NTS_INTERNAL_CSTR_FILETIME		__TIMESTAMP__
-#elif defined   clang
-#   if defined  ICC
-#   else
-#   endif
-#elif defined   _MSC_VER
-#else
-	#define nts_internal_forceinline
-	#define nts_internal_likely(x)			(x)
-	#define nts_internal_unlikely(x)		(x)
-	#define NTS_INTERNAL_CSTR_FILE			NTS_INTERNAL_NULL
-	#define NTS_INTERNAL_CSTR_LINE			0
-	#define NTS_INTERNAL_CSTR_FUNC			NTS_INTERNAL_NULL
-	#define NTS_INTERNAL_CSTR_COMPDATE		NTS_INTERNAL_NULL
-	#define NTS_INTERNAL_CSTR_COMPTIME		NTS_INTERNAL_NULL
-	#define NTS_INTERNAL_CSTR_FILETIME		NTS_INTERNAL_NULL
-#endif
+/**
+ * @def NTS_VALID
+ * 	Same as 1
+ */
+#define NTS_INVAL 1
 
-#ifdef nts_internal_forceinline
-	#define nts_internal_hdrfunc         static inline nts_internal_forceinline
-#else
-	#define nts_internal_hdrfunc         static inline
-#endif
+/**
+ * @def NTS_LOGGER(...)
+ * 	Default output method (can be overridden)
+ */
+#ifndef NTS_LOGGER
+#ifdef __KERNEL__
+#define NTS_LOGGER(...) \
+	printk(KERN_INFO __VA_ARGS__)
+#else /* __KERNEL__ */
+#define NTS_LOGGER(...) \
+	printf(__VA_ARGS__)
+#endif /* __KERNEL__ */
+#endif /* NTS_LOGGER */
 
-#define NTS_INTERNAL_STYLE_RESET       "\x1b[0m"
-#define NTS_INTERNAL_FONT_BOLD         "\x1b[1m"
-#define NTS_INTERNAL_FONT_ITALICS      "\x1b[3m"
-#define NTS_INTERNAL_FONT_UNDERLINE    "\x1b[4m"
-#define NTS_INTERNAL_FONT_STRIKETHR    "\x1b[9m"
-#define NTS_INTERNAL_COLOR_BLACK       "\x1b[30m"
-#define NTS_INTERNAL_COLOR_RED         "\x1b[31m"
-#define NTS_INTERNAL_COLOR_GREEN       "\x1b[32m"
-#define NTS_INTERNAL_COLOR_YELLOW      "\x1b[33m"
-#define NTS_INTERNAL_COLOR_BLUE        "\x1b[34m"
-#define NTS_INTERNAL_COLOR_MAGENTA     "\x1b[35m"
-#define NTS_INTERNAL_COLOR_CYAN        "\x1b[36m"
-#define NTS_INTERNAL_COLOR_WHITE       "\x1b[37m"
-#define NTS_INTERNAL_COLOR_RESET       "\x1b[39m"
-
-#define NTS_EXITCODE_PASSED     0
-#define NTS_EXITCODE_TFALSE     1
-#define NTS_EXITCODE_TCFAIL     2
-#define NTS_EXITCODE_TCINTR     3
-
-enum nts_internal_verbose_level
+struct nts_internal_testcase
 {
-	NTS_INTERNAL_LVLNONE	= 0b0000000,
-	NTS_INTERNAL_LVLIGN		= 0b0000001,
-	NTS_INTERNAL_LVLRSLT	= 0b0000010,
-	NTS_INTERNAL_LVLINFO	= 0b0000100,
-	NTS_INTERNAL_LVLEXPR	= 0b0001000,
-	NTS_INTERNAL_LVLSPEC	= 0b0010000,
-	NTS_INTERNAL_LVLCONT	= 0b0100000,
-	NTS_INTERNAL_LVLEXIT	= 0b1000000,
-};
-typedef enum nts_internal_verbose_level NTS_LVLENUM;
-
-#ifdef NBE_STRICT_TEST
-	#define NTS_LVLNORMAL	NTS_INTERNAL_LVLRSLT | NTS_INTERNAL_LVLINFO | NTS_INTERNAL_LVLEXPR  | NTS_INTERNAL_LVLEXIT
-	#define NTS_LVLSIMPLE	NTS_INTERNAL_LVLRSLT | NTS_INTERNAL_LVLINFO | NTS_INTERNAL_LVLEXIT
-	#define NTS_LVLRESULT	NTS_INTERNAL_LVLRSLT | NTS_INTERNAL_LVLEXIT
-	#define NTS_LVLSILENT	NTS_INTERNAL_LVLEXIT
-#else
-	#define NTS_LVLNORMAL	NTS_INTERNAL_LVLRSLT | NTS_INTERNAL_LVLINFO | NTS_INTERNAL_LVLEXPR
-	#define NTS_LVLSIMPLE	NTS_INTERNAL_LVLRSLT | NTS_INTERNAL_LVLINFO
-	#define NTS_LVLRESULT	NTS_INTERNAL_LVLRSLT
-	#define NTS_LVLSILENT	NTS_INTERNAL_LVLNONE
-#endif
-
-struct nts_internal_testcase_info
-{
-	int f_stop;
-	int f_spec;
+	const char *name;
 	unsigned long test_cnt;
-	unsigned long ignore_cnt;
+	unsigned long eval_cnt;
 	unsigned long fail_cnt;
+	int skip_next;
 };
-typedef struct nts_internal_testcase_info * NTS_STRUCT;
+typedef struct nts_internal_testcase nts_tc_t;
 
-nts_internal_hdrfunc void nts_internal_assert(
-	int expr_result, const char *expr,
-	const char * file, unsigned int line,
-	NTS_STRUCT tc, NTS_LVLENUM verbosity )
+static inline int nts_internal_assert(nts_tc_t *tc, const char *expr, unsigned long value1, unsigned long value2)
 {
-	if ( nts_internal_unlikely( verbosity & NTS_INTERNAL_LVLIGN ) )
-	{
-		tc->ignore_cnt++;
-		goto assert_out;
-	}
-
-	if ( verbosity & NTS_INTERNAL_LVLRSLT )
-	{
-		printf( "[#] ");
-	}
-
-	if ( verbosity & NTS_INTERNAL_LVLINFO )
-	{
-		printf( "%s(%u) : ", file ? file : "unkfile", line );
-	}
-
-	if ( verbosity & NTS_INTERNAL_LVLRSLT )
-	{
-		printf( "%s%s%s%s\n", NTS_INTERNAL_FONT_BOLD,
-			expr_result ? NTS_INTERNAL_COLOR_GREEN : NTS_INTERNAL_COLOR_RED,
-			expr_result ? "PASS" : "FAILED", NTS_INTERNAL_STYLE_RESET );
-	}
-
-	if ( verbosity & NTS_INTERNAL_LVLEXPR )
-	{
-		printf( "\tExpression : %s%s%s\n",
-			NTS_INTERNAL_COLOR_CYAN, expr, NTS_INTERNAL_STYLE_RESET );
-	}
-
-	if ( verbosity & NTS_INTERNAL_LVLSPEC )
-	{
-		tc->f_spec = 1;
-	}
-
-	if ( !(expr_result) )
-	{
-		if( !(verbosity & NTS_INTERNAL_LVLCONT) )
-		{
-#ifdef NBE_STRICT_TEST
-			if ( verbosity & NTS_INTERNAL_LVLEXIT )
-			{
-				exit( NTS_EXITCODE_TFALSE );
-			}
-#endif
-			tc->f_stop = NTS_INTERNAL_LVLIGN;
-		}
-		tc->fail_cnt++;
-	}
-
-	if ( !(tc->f_spec) && (verbosity & NTS_INTERNAL_LVLRSLT) )
-	{
-		printf( "\n" );
-	}
-
-assert_out:
+	const int eval = !!(value1 == value2);
+	int ret = NTS_VALID;
 	tc->test_cnt++;
-	return;
+	if (!(tc->skip_next))
+	{
+		NTS_LOGGER("%s: %s\n", tc->name, !!eval ? "PASS" : "FAILED");
+		NTS_LOGGER("\tEvaluation: %lu == %lu\n", value1, value2);
+		NTS_LOGGER("\tExpression: %s\n", expr);
+		if (!eval)
+		{
+			tc->fail_cnt++;
+			ret = NTS_INVAL;
+		}
+		tc->eval_cnt++;
+	}
+	return ret;
 }
 
-nts_internal_hdrfunc void nts_internal_report_tc( const char * tcn, NTS_STRUCT tc )
+static inline void nts_internal_report(nts_tc_t *tc)
 {
-	double pass_rate = 0.0;
-
-	printf("\n%s[*] TESTCASE Report%s\n",
-		NTS_INTERNAL_FONT_BOLD, NTS_INTERNAL_STYLE_RESET );
-	printf(" %s|%s TC Name   : %s%s%s\n",
-		NTS_INTERNAL_FONT_BOLD, NTS_INTERNAL_STYLE_RESET, NTS_INTERNAL_FONT_BOLD,
-		tcn, NTS_INTERNAL_STYLE_RESET );
-	printf(" %s|%s Result    : %s%s%s%s\n",
-		NTS_INTERNAL_FONT_BOLD, NTS_INTERNAL_STYLE_RESET, NTS_INTERNAL_FONT_BOLD,
-		tc->fail_cnt ? NTS_INTERNAL_COLOR_RED : NTS_INTERNAL_COLOR_GREEN,
-		tc->f_stop ? "INTERRUPTED" : (tc->fail_cnt ? "FAILED" : "PASS"), NTS_INTERNAL_STYLE_RESET );
-	printf(" %s|%s Tested    : %lu%s\n", NTS_INTERNAL_FONT_BOLD, NTS_INTERNAL_STYLE_RESET,
-		tc->test_cnt, NTS_INTERNAL_COLOR_RESET );
-	printf(" %s|%s Passed    : %lu%s\n", NTS_INTERNAL_FONT_BOLD, NTS_INTERNAL_STYLE_RESET,
-		tc->test_cnt - tc->fail_cnt, NTS_INTERNAL_COLOR_RESET );
-	printf(" %s|%s Failed    : %lu%s\n",NTS_INTERNAL_FONT_BOLD, NTS_INTERNAL_STYLE_RESET,
-		tc->fail_cnt, NTS_INTERNAL_COLOR_RESET );
-	printf(" %s|%s Ignored   : %lu%s\n", NTS_INTERNAL_FONT_BOLD, NTS_INTERNAL_STYLE_RESET,
-		tc->ignore_cnt, NTS_INTERNAL_COLOR_RESET );
-
-	if ( tc->f_stop )
-	{
-		pass_rate = -1.0;
-	}
-	else
-	{
-		if ( tc->fail_cnt )
-		{
-			pass_rate = (tc->test_cnt ^ tc->fail_cnt) ?  (100.0 - ((tc->fail_cnt * 100.0) / tc->test_cnt)) : 0.0;
-		}
-		else
-		{
-			pass_rate = 100.0;
-		}
-	}
-
-	if ( pass_rate < 0 )
-	{
-		printf(" %s|%s Pass Rate : %s%s%s%s\n", NTS_INTERNAL_FONT_BOLD, NTS_INTERNAL_STYLE_RESET,
-			NTS_INTERNAL_FONT_BOLD, NTS_INTERNAL_COLOR_MAGENTA, "unknown" , NTS_INTERNAL_COLOR_RESET );
-	}
-	else
-	{
-		if ( pass_rate < 30 )
-		{
-			printf(" %s|%s Pass Rate : %s%s%.2lf%%%s\n",
-				NTS_INTERNAL_FONT_BOLD, NTS_INTERNAL_STYLE_RESET,
-				NTS_INTERNAL_FONT_BOLD, NTS_INTERNAL_COLOR_RED, pass_rate , NTS_INTERNAL_COLOR_RESET );
-		}
-		else if ( pass_rate < 70 )
-		{
-			printf(" %s|%s Pass Rate : %s%s%.2lf%%%s\n",
-				NTS_INTERNAL_FONT_BOLD, NTS_INTERNAL_STYLE_RESET,
-				NTS_INTERNAL_FONT_BOLD, NTS_INTERNAL_COLOR_MAGENTA, pass_rate , NTS_INTERNAL_COLOR_RESET );
-		}
-		else if ( pass_rate < 100 )
-		{
-			printf(" %s|%s Pass Rate : %s%s%.2lf%%%s\n",
-				NTS_INTERNAL_FONT_BOLD, NTS_INTERNAL_STYLE_RESET,
-				NTS_INTERNAL_FONT_BOLD, NTS_INTERNAL_COLOR_YELLOW, pass_rate , NTS_INTERNAL_COLOR_RESET );
-		}
-		else
-		{
-			printf(" %s|%s Pass Rate : %s%s%.2lf%%%s\n",
-				NTS_INTERNAL_FONT_BOLD, NTS_INTERNAL_STYLE_RESET,
-				NTS_INTERNAL_FONT_BOLD, NTS_INTERNAL_COLOR_GREEN, pass_rate , NTS_INTERNAL_COLOR_RESET );
-		}
-	}
-	printf("%s[*]%s\n\n", NTS_INTERNAL_FONT_BOLD, NTS_INTERNAL_STYLE_RESET );
-
-#ifdef NBE_STRICT_TEST
-	if ( pass_rate != 100 )
-	{
-		exit( pass_rate < 0 ? NTS_EXITCODE_TCFAIL : NTS_EXITCODE_TCINTR );
-	}
-#endif
+	NTS_LOGGER("[*] TESTCASE Report\n");
+	NTS_LOGGER(" | TC Name   : %s\n", tc->name);
+	NTS_LOGGER(" | Testnum   : %lu\n", tc->test_cnt);
+	NTS_LOGGER(" | Result    : %s\n", !!(tc->fail_cnt) ? "FAILED" : "PASS");
+	NTS_LOGGER(" | Tested    : %lu\n", tc->eval_cnt);
+	NTS_LOGGER(" | Passed    : %lu\n", tc->eval_cnt - tc->fail_cnt);
+	NTS_LOGGER(" | Failed    : %lu\n", tc->fail_cnt);
+	NTS_LOGGER("[*]\n");
 }
 
 #define NTS_INTERNAL_STRINGIFY( expr )                 #expr
-
 #define NTS_INTERNAL_TESTEQ_EXPR( expr1, expr2 )       expr1 == expr2
+#define NTS_INTERNAL_TESTNE_EXPR( expr1, expr2 )       expr1 != expr2
+#define NTS_INTERNAL_TESTLT_EXPR( expr1, expr2 )       expr1 < expr2
+#define NTS_INTERNAL_TESTLE_EXPR( expr1, expr2 )       expr1 <= expr2
+#define NTS_INTERNAL_TESTGT_EXPR( expr1, expr2 )       expr1 > expr2
+#define NTS_INTERNAL_TESTGE_EXPR( expr1, expr2 )       expr1 >= expr2
+#define NTS_INTERNAL_STRC(tc) \
+	nts_tc_t nts_strc_ ## tc
+#define NTS_INTERNAL_INIT(tc) \
+	NTS_INTERNAL_STRC(tc) = { \
+		.name = NTS_INTERNAL_STRINGIFY(tc), \
+		.test_cnt = 0, \
+		.eval_cnt = 0, \
+		.fail_cnt = 0, \
+		.skip_next = 0 \
+	}
+#define NTS_INTERNAL_ACCESS(tc) \
+	(&( nts_strc_ ## tc ))
+#define NTS_INTERNAL_FUNC(tc) \
+	void nts_func_ ## tc (void)
+#define NTS_INTERNAL_ASSERT(tc, expr, value1, value2) \
+	nts_internal_assert((tc), NTS_INTERNAL_STRINGIFY(expr), (value1), (value2))
 
-#define NTS_INTERNAL_TC_STRC( testcase )               struct nts_internal_testcase_info nts_info_ ## testcase
+/**
+ * @def NTS_DECLARE(tc)
+ * 	Macro function to declare test-cases.
+ * 	Place in header files.
+ */
+#define NTS_DECLARE(tc) \
+	extern NTS_INTERNAL_STRC(tc); \
+	extern NTS_INTERNAL_FUNC(tc)
 
-#define NTS_INTERNAL_TC_FUNC( testcase )               void nts_tc_ ## testcase (void)
+/**
+ * @def NTS_DEFINE(tc)
+ * 	Macro function to define test-cases.
+ * 	Place in a source file.
+ */
+#define NTS_DEFINE(tc) \
+	NTS_INTERNAL_INIT(tc); \
+	NTS_INTERNAL_FUNC(tc)
 
-#define NTS_INTERNAL_ACCESS_STRC(testcase)             nts_info_ ## testcase
+/**
+ * @def NTS_CHECK_EQ(tc)
+ * 	Macro function to write check-expressions.
+ * 	If two expressions are the same, will return NTS_VALID.
+ * 	Else, will return NTS_INVAL.
+ */
+#define NTS_CHECK_EQ(tc, expr1, expr2) \
+	NTS_INTERNAL_ASSERT(NTS_INTERNAL_ACCESS(tc), \
+		NTS_INTERNAL_TESTEQ_EXPR(expr1, expr2), \
+		(unsigned long)(expr1), (unsigned long)(expr2))
 
-#define NTS_INTERNAL_ASSERT( tc, expr, lvl ) \
-	nts_internal_assert( (expr), NTS_INTERNAL_STRINGIFY(expr), NTS_INTERNAL_CSTR_FILE, NTS_INTERNAL_CSTR_LINE, \
-		&(NTS_INTERNAL_ACCESS_STRC(tc)), lvl | (NTS_INTERNAL_ACCESS_STRC(tc)).f_stop )
+/**
+ * @def NTS_CHECK_NE(tc)
+ * 	Macro function to write check-expressions.
+ * 	If two expressions are not the same, will return NTS_VALID.
+ * 	Else, will return NTS_INVAL.
+ */
+#define NTS_CHECK_NE(tc, expr1, expr2) \
+	NTS_INTERNAL_ASSERT(NTS_INTERNAL_ACCESS(tc), \
+		NTS_INTERNAL_TESTNE_EXPR(expr1, expr2), \
+		(unsigned long)(expr1), (unsigned long)(expr2))
 
-#define NTS_INTERNAL_DO_SPECULATE( tc, expr1, expr2, expr1_var, expr2_var ) \
-	do{ \
-		if( (NTS_INTERNAL_ACCESS_STRC(tc)).f_spec ) \
-		{ \
-			(NTS_INTERNAL_ACCESS_STRC(tc)).f_spec = 0; \
-			printf( "\tSpeculation result : %s%llu(%s) == %llu(%s)%s\n\n", \
-				NTS_INTERNAL_COLOR_CYAN, expr1, expr1_var, \
-				expr2, expr2_var, NTS_INTERNAL_STYLE_RESET ); \
-		} \
-	}while(0);
+/**
+ * @def NTS_CHECK_LT(tc)
+ * 	Macro function to write check-expressions.
+ * 	If expr1 is less than expr2, will return NTS_VALID.
+ * 	Else, will return NTS_INVAL.
+ */
+#define NTS_CHECK_LT(tc, expr1, expr2) \
+	NTS_INTERNAL_ASSERT(NTS_INTERNAL_ACCESS(tc), \
+		NTS_INTERNAL_TESTLT_EXPR(expr1, expr2), \
+		(unsigned long)(expr1), (unsigned long)(expr2))
 
-#define NTS_INTERNAL_SPECULATE( tc, expr1, expr2, lvl ) \
-	do{ NTS_INTERNAL_ASSERT( tc, NTS_INTERNAL_TESTEQ_EXPR(expr1, expr2), lvl | NTS_INTERNAL_LVLSPEC ); \
-		unsigned long long expr1_var = (unsigned long long)(expr1); \
-		unsigned long long expr2_var = (unsigned long long)(expr2); \
-		NTS_INTERNAL_DO_SPECULATE( tc, expr1_var, expr2_var, NTS_INTERNAL_STRINGIFY(expr1), NTS_INTERNAL_STRINGIFY(expr2) ); \
-	}while(0);
+/**
+ * @def NTS_CHECK_LE(tc)
+ * 	Macro function to write check-expressions.
+ * 	If expr1 is less than or equal to expr2, will return NTS_VALID.
+ * 	Else, will return NTS_INVAL.
+ */
+#define NTS_CHECK_LE(tc, expr1, expr2) \
+	NTS_INTERNAL_ASSERT(NTS_INTERNAL_ACCESS(tc), \
+		NTS_INTERNAL_TESTLE_EXPR(expr1, expr2), \
+		(unsigned long)(expr1), (unsigned long)(expr2))
 
-#define NTS_DECLARE_TC( testcase )						extern NTS_INTERNAL_TC_STRC(testcase) ; NTS_INTERNAL_TC_FUNC(testcase)
+/**
+ * @def NTS_CHECK_GT(tc)
+ * 	Macro function to write check-expressions.
+ * 	If expr1 is greater than expr2, will return NTS_VALID.
+ * 	Else, will return NTS_INVAL.
+ */
+#define NTS_CHECK_GT(tc, expr1, expr2) \
+	NTS_INTERNAL_ASSERT(NTS_INTERNAL_ACCESS(tc), \
+		NTS_INTERNAL_TESTGT_EXPR(expr1, expr2), \
+		(unsigned long)(expr1), (unsigned long)(expr2))
 
-#define NTS_DEFINE_TC( testcase )						NTS_INTERNAL_TC_STRC(testcase) ; NTS_INTERNAL_TC_FUNC(testcase)
+/**
+ * @def NTS_CHECK_GE(tc)
+ * 	Macro function to write check-expressions.
+ * 	If two expr1 is greater than or equal to expr2, will return NTS_VALID.
+ * 	If same, will return NTS_INVAL.
+ */
+#define NTS_CHECK_GE(tc, expr1, expr2) \
+	NTS_INTERNAL_ASSERT(NTS_INTERNAL_ACCESS(tc), \
+		NTS_INTERNAL_TESTGE_EXPR(expr1, expr2), \
+		(unsigned long)(expr1), (unsigned long)(expr2))
 
-#define NTS_CALL_TC( testcase )							nts_tc_ ## testcase ()
+/**
+ * @def NTS_REQUIRE_EQ(tc)
+ * 	Macro function to write check-expressions.
+ * 	If two expressions are not the same, the test-case will fail immediately.
+ */
+#define NTS_REQUIRE_EQ(tc, expr1, expr2) \
+	if (NTS_CHECK_EQ(tc, expr1, expr2) == NTS_INVAL) \
+	{ \
+		NTS_INTERNAL_ACCESS(tc)->skip_next = 1; \
+	}
 
-#define NTS_REQUIRE( tc, expr )							NTS_INTERNAL_ASSERT( tc, expr, NTS_LVLNORMAL )
+/**
+ * @def NTS_REQUIRE_NE(tc)
+ * 	Macro function to write check-expressions.
+ * 	If two expressions are the same, the test-case will fail immediately.
+ */
+#define NTS_REQUIRE_NE(tc, expr1, expr2) \
+	if (NTS_CHECK_NE(tc, expr1, expr2) == NTS_INVAL) \
+	{ \
+		NTS_INTERNAL_ACCESS(tc)->skip_next = 1; \
+	}
 
-#define NTS_CHECK( tc, expr )							NTS_INTERNAL_ASSERT( tc, expr, NTS_LVLNORMAL | NTS_INTERNAL_LVLCONT )
+/**
+ * @def NTS_REQUIRE_LT(tc)
+ * 	Macro function to write check-expressions.
+ * 	If expr1 is greater than or equal to expr2, the test-case will fail immediately.
+ */
+#define NTS_REQUIRE_LT(tc, expr1, expr2) \
+	if (NTS_CHECK_LT(tc, expr1, expr2) == NTS_INVAL) \
+	{ \
+		NTS_INTERNAL_ACCESS(tc)->skip_next = 1; \
+	}
 
-#define NTS_REQUIRE_SPEC( tc, expr1, expr2 )			NTS_INTERNAL_SPECULATE( tc, expr1, expr2, NTS_LVLNORMAL )
+/**
+ * @def NTS_REQUIRE_LE(tc)
+ * 	Macro function to write check-expressions.
+ * 	If expr1 is greater than expr2, the test-case will fail immediately.
+ */
+#define NTS_REQUIRE_LE(tc, expr1, expr2) \
+	if (NTS_CHECK_LE(tc, expr1, expr2) == NTS_INVAL) \
+	{ \
+		NTS_INTERNAL_ACCESS(tc)->skip_next = 1; \
+	}
 
-#define NTS_CHECK_SPEC( tc, expr1, expr2 )				NTS_INTERNAL_SPECULATE( tc, expr1, expr2, NTS_LVLNORMAL | NTS_INTERNAL_LVLCONT )
+/**
+ * @def NTS_REQUIRE_GT(tc)
+ * 	Macro function to write check-expressions.
+ * 	If expr1 is less than or euqal to expr2, the test-case will fail immediately.
+ */
+#define NTS_REQUIRE_GT(tc, expr1, expr2) \
+	if (NTS_CHECK_GT(tc, expr1, expr2) == NTS_INVAL) \
+	{ \
+		NTS_INTERNAL_ACCESS(tc)->skip_next = 1; \
+	}
 
-#define NTS_REQUIRE_LVL( tc, expr, lvl )				NTS_INTERNAL_ASSERT( tc, expr, lvl )
+/**
+ * @def NTS_REQUIRE_GE(tc)
+ * 	Macro function to write check-expressions.
+ * 	If expr1 is less than expr2, the test-case will fail immediately.
+ */
+#define NTS_REQUIRE_GE(tc, expr1, expr2) \
+	if (NTS_CHECK_GE(tc, expr1, expr2) == NTS_INVAL) \
+	{ \
+		NTS_INTERNAL_ACCESS(tc)->skip_next = 1; \
+	}
 
-#define NTS_CHECK_LVL( tc, expr, lvl )					NTS_INTERNAL_ASSERT( tc, expr, lvl | NTS_INTERNAL_LVLCONT )
+/**
+ * @def NTS_RUN(tc)
+ * 	Macro function to run test-cases.
+ */
+#define NTS_RUN(tc) \
+	nts_func_ ## tc ()
 
-#define NTS_REQUIRE_SPEC_LVL( tc, expr1, expr2, lvl )	NTS_INTERNAL_SPECULATE( tc, expr1, expr2, lvl )
+/**
+ * @def NTS_RUN_RESULT(tc)
+ * 	Macro function to get results.
+ * 	Will return fail counts.
+ */
+#define NTS_RESULT(tc) \
+	(NTS_INTERNAL_ACCESS(tc)->fail_cnt)
 
-#define NTS_CHECK_SPEC_LVL( tc, expr1, expr2, lvl )		NTS_INTERNAL_SPECULATE( tc, expr1, expr2, lvl | NTS_INTERNAL_LVLCONT )
-
-#define NTS_REPORT( tc )								nts_internal_report_tc( #tc, &(NTS_INTERNAL_ACCESS_STRC(tc)) )
+/**
+ * @def NTS_REPORT(tc)
+ * 	Macro function to print statistics.
+ */
+#define NTS_REPORT(tc) \
+	nts_internal_report(NTS_INTERNAL_ACCESS(tc))
 
 #endif

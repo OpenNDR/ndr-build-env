@@ -34,8 +34,8 @@ buildlist:
 	$(eval BUILDLIST += $(wildcard $(NBE_MK_COVPATH)/*.asm))
 
 buildtest:
-	@gcc -coverage -o $(COVAPP)_cov $(BUILDLIST) -I$(SRCDIR) -I$(NBE_MK_INCPATH) -L$(NBE_LIBPATH) $(LIBLIST) $(NBE_LIBS) $(CFLAGS) $(EXTRA_CFLAGS)
-	@gcc -o $(COVAPP).app $(BUILDLIST) -I$(SRCDIR) -I$(NBE_MK_INCPATH) -L$(NBE_LIBPATH) $(NBE_LIBS) $(LIBLIST) $(CFLAGS) $(EXTRA_CFLAGS)
+	@gcc -coverage -o $(COVAPP)_cov $(BUILDLIST) -I$(SRCDIR) -I$(NBE_MK_INCPATH) -L$(NBE_LIBPATH) $(LIBLIST) $(NBE_LIBS) $(CFLAGS) $(EXTRA_CFLAGS) -DNTS_MAIN_$(COVAPP)
+	@gcc -o $(COVAPP).app $(BUILDLIST) -I$(SRCDIR) -I$(NBE_MK_INCPATH) -L$(NBE_LIBPATH) $(NBE_LIBS) $(LIBLIST) $(CFLAGS) $(EXTRA_CFLAGS) -DNTS_MAIN_$(COVAPP)
 
 gcovlist:
 	$(eval GCOVLIST += $(foreach COVFILE, $(COVLIST), $(shell ls $(NBE_MK_COVPATH)/$(COVFILE).c 2>/dev/null)))
@@ -43,7 +43,8 @@ gcovlist:
 
 gcovgen:
 	@mv -f $(COVAPP).app $(NBE_COVPATH)/$(COVAPP).app
-	@./$(COVAPP)_cov $(TESTARGS)
+	@./$(COVAPP)_cov $(TESTARGS) > $(COVAPP).result 2>&1
+	@mv -f $(COVAPP).result $(NBE_COVPATH)/$(COVAPP).result
 	@gcov $(GCOVLIST) -o .
 
 gcovmv:
