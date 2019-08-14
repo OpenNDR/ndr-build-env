@@ -33,6 +33,17 @@
 #endif /* __KERNEL__ */
 #endif /* NTS_LOGGER */
 
+enum nts_internal_evaltype
+{
+	NTS_INTERNAL_EVAL_EQ,
+	NTS_INTERNAL_EVAL_NE,
+	NTS_INTERNAL_EVAL_LT,
+	NTS_INTERNAL_EVAL_LE,
+	NTS_INTERNAL_EVAL_GT,
+	NTS_INTERNAL_EVAL_GE,
+};
+typedef enum nts_internal_evaltype nts_eval_t;
+
 struct nts_internal_testcase
 {
 	const char *name;
@@ -43,15 +54,39 @@ struct nts_internal_testcase
 };
 typedef struct nts_internal_testcase nts_tc_t;
 
-static inline int nts_internal_assert(nts_tc_t *tc, const char *expr, unsigned long value1, unsigned long value2)
+static inline int nts_internal_assert(nts_tc_t *tc, const char *expr,
+		unsigned long value1, unsigned long value2, nts_eval_t eval_type )
 {
-	const int eval = !!(value1 == value2);
+	int eval;
 	int ret = NTS_VALID;
+
+	switch ( eval_type )
+	{
+		case NTS_INTERNAL_EVAL_EQ:
+			eval = !!(value1 == value2);
+			break;
+		case NTS_INTERNAL_EVAL_NE:
+			eval = !!(value1 != value2);
+			break;
+		case NTS_INTERNAL_EVAL_LT:
+			eval = !!(value1 < value2);
+			break;
+		case NTS_INTERNAL_EVAL_LE:
+			eval = !!(value1 <= value2);
+			break;
+		case NTS_INTERNAL_EVAL_GT:
+			eval = !!(value1 > value2);
+			break;
+		case NTS_INTERNAL_EVAL_GE:
+			eval = !!(value1 >= value2);
+			break;
+	}
+
 	tc->test_cnt++;
 	if (!(tc->skip_next))
 	{
 		NTS_LOGGER("%s: %s\n", tc->name, !!eval ? "PASS" : "FAILED");
-		NTS_LOGGER("\tEvaluation: %lu == %lu\n", value1, value2);
+		NTS_LOGGER("\tEvaluation: %lu, %lu\n", value1, value2);
 		NTS_LOGGER("\tExpression: %s\n", expr);
 		if (!eval)
 		{
@@ -76,12 +111,12 @@ static inline void nts_internal_report(nts_tc_t *tc)
 }
 
 #define NTS_INTERNAL_STRINGIFY( expr )                 #expr
-#define NTS_INTERNAL_TESTEQ_EXPR( expr1, expr2 )       expr1 == expr2
-#define NTS_INTERNAL_TESTNE_EXPR( expr1, expr2 )       expr1 != expr2
-#define NTS_INTERNAL_TESTLT_EXPR( expr1, expr2 )       expr1 < expr2
-#define NTS_INTERNAL_TESTLE_EXPR( expr1, expr2 )       expr1 <= expr2
-#define NTS_INTERNAL_TESTGT_EXPR( expr1, expr2 )       expr1 > expr2
-#define NTS_INTERNAL_TESTGE_EXPR( expr1, expr2 )       expr1 >= expr2
+#define NTS_INTERNAL_TESTEXPR_EQ( expr1, expr2 )       expr1 == expr2
+#define NTS_INTERNAL_TESTEXPR_NE( expr1, expr2 )       expr1 != expr2
+#define NTS_INTERNAL_TESTEXPR_LT( expr1, expr2 )       expr1 < expr2
+#define NTS_INTERNAL_TESTEXPR_LE( expr1, expr2 )       expr1 <= expr2
+#define NTS_INTERNAL_TESTEXPR_GT( expr1, expr2 )       expr1 > expr2
+#define NTS_INTERNAL_TESTEXPR_GE( expr1, expr2 )       expr1 >= expr2
 #define NTS_INTERNAL_STRC(tc) \
 	nts_tc_t nts_strc_ ## tc
 #define NTS_INTERNAL_INIT(tc) \
@@ -96,8 +131,9 @@ static inline void nts_internal_report(nts_tc_t *tc)
 	(&( nts_strc_ ## tc ))
 #define NTS_INTERNAL_FUNC(tc) \
 	void nts_func_ ## tc (void)
-#define NTS_INTERNAL_ASSERT(tc, expr, value1, value2) \
-	nts_internal_assert((tc), NTS_INTERNAL_STRINGIFY(expr), (value1), (value2))
+#define NTS_INTERNAL_ASSERT(tc, expr, value1, value2, cond) \
+	nts_internal_assert((tc), NTS_INTERNAL_STRINGIFY(expr), \
+			(value1), (value2), NTS_INTERNAL_EVAL_ ##cond )
 
 /**
  * @def NTS_DECLARE(tc)
@@ -118,133 +154,23 @@ static inline void nts_internal_report(nts_tc_t *tc)
 	NTS_INTERNAL_FUNC(tc)
 
 /**
- * @def NTS_CHECK_EQ(tc)
+ * @def NTS_CHECK(tc, cond, expr1, expr2)
  * 	Macro function to write check-expressions.
- * 	If two expressions are the same, will return NTS_VALID.
+ * 	If two expressions are valid to a condition, will return NTS_VALID.
  * 	Else, will return NTS_INVAL.
  */
-#define NTS_CHECK_EQ(tc, expr1, expr2) \
+#define NTS_CHECK(tc, cond, expr1, expr2) \
 	NTS_INTERNAL_ASSERT(NTS_INTERNAL_ACCESS(tc), \
-		NTS_INTERNAL_TESTEQ_EXPR(expr1, expr2), \
-		(unsigned long)(expr1), (unsigned long)(expr2))
+		NTS_INTERNAL_TESTEXPR_ ##cond (expr1, expr2), \
+		(unsigned long)(expr1), (unsigned long)(expr2), cond)
 
 /**
- * @def NTS_CHECK_NE(tc)
+ * @def NTS_REQUIRE_EQ(tc, cond, expr1, expr2)
  * 	Macro function to write check-expressions.
- * 	If two expressions are not the same, will return NTS_VALID.
- * 	Else, will return NTS_INVAL.
+ * 	If two expressions are violate a condition, the test-case will fail immediately.
  */
-#define NTS_CHECK_NE(tc, expr1, expr2) \
-	NTS_INTERNAL_ASSERT(NTS_INTERNAL_ACCESS(tc), \
-		NTS_INTERNAL_TESTNE_EXPR(expr1, expr2), \
-		(unsigned long)(expr1), (unsigned long)(expr2))
-
-/**
- * @def NTS_CHECK_LT(tc)
- * 	Macro function to write check-expressions.
- * 	If expr1 is less than expr2, will return NTS_VALID.
- * 	Else, will return NTS_INVAL.
- */
-#define NTS_CHECK_LT(tc, expr1, expr2) \
-	NTS_INTERNAL_ASSERT(NTS_INTERNAL_ACCESS(tc), \
-		NTS_INTERNAL_TESTLT_EXPR(expr1, expr2), \
-		(unsigned long)(expr1), (unsigned long)(expr2))
-
-/**
- * @def NTS_CHECK_LE(tc)
- * 	Macro function to write check-expressions.
- * 	If expr1 is less than or equal to expr2, will return NTS_VALID.
- * 	Else, will return NTS_INVAL.
- */
-#define NTS_CHECK_LE(tc, expr1, expr2) \
-	NTS_INTERNAL_ASSERT(NTS_INTERNAL_ACCESS(tc), \
-		NTS_INTERNAL_TESTLE_EXPR(expr1, expr2), \
-		(unsigned long)(expr1), (unsigned long)(expr2))
-
-/**
- * @def NTS_CHECK_GT(tc)
- * 	Macro function to write check-expressions.
- * 	If expr1 is greater than expr2, will return NTS_VALID.
- * 	Else, will return NTS_INVAL.
- */
-#define NTS_CHECK_GT(tc, expr1, expr2) \
-	NTS_INTERNAL_ASSERT(NTS_INTERNAL_ACCESS(tc), \
-		NTS_INTERNAL_TESTGT_EXPR(expr1, expr2), \
-		(unsigned long)(expr1), (unsigned long)(expr2))
-
-/**
- * @def NTS_CHECK_GE(tc)
- * 	Macro function to write check-expressions.
- * 	If two expr1 is greater than or equal to expr2, will return NTS_VALID.
- * 	If same, will return NTS_INVAL.
- */
-#define NTS_CHECK_GE(tc, expr1, expr2) \
-	NTS_INTERNAL_ASSERT(NTS_INTERNAL_ACCESS(tc), \
-		NTS_INTERNAL_TESTGE_EXPR(expr1, expr2), \
-		(unsigned long)(expr1), (unsigned long)(expr2))
-
-/**
- * @def NTS_REQUIRE_EQ(tc)
- * 	Macro function to write check-expressions.
- * 	If two expressions are not the same, the test-case will fail immediately.
- */
-#define NTS_REQUIRE_EQ(tc, expr1, expr2) \
-	if (NTS_CHECK_EQ(tc, expr1, expr2) == NTS_INVAL) \
-	{ \
-		NTS_INTERNAL_ACCESS(tc)->skip_next = 1; \
-	}
-
-/**
- * @def NTS_REQUIRE_NE(tc)
- * 	Macro function to write check-expressions.
- * 	If two expressions are the same, the test-case will fail immediately.
- */
-#define NTS_REQUIRE_NE(tc, expr1, expr2) \
-	if (NTS_CHECK_NE(tc, expr1, expr2) == NTS_INVAL) \
-	{ \
-		NTS_INTERNAL_ACCESS(tc)->skip_next = 1; \
-	}
-
-/**
- * @def NTS_REQUIRE_LT(tc)
- * 	Macro function to write check-expressions.
- * 	If expr1 is greater than or equal to expr2, the test-case will fail immediately.
- */
-#define NTS_REQUIRE_LT(tc, expr1, expr2) \
-	if (NTS_CHECK_LT(tc, expr1, expr2) == NTS_INVAL) \
-	{ \
-		NTS_INTERNAL_ACCESS(tc)->skip_next = 1; \
-	}
-
-/**
- * @def NTS_REQUIRE_LE(tc)
- * 	Macro function to write check-expressions.
- * 	If expr1 is greater than expr2, the test-case will fail immediately.
- */
-#define NTS_REQUIRE_LE(tc, expr1, expr2) \
-	if (NTS_CHECK_LE(tc, expr1, expr2) == NTS_INVAL) \
-	{ \
-		NTS_INTERNAL_ACCESS(tc)->skip_next = 1; \
-	}
-
-/**
- * @def NTS_REQUIRE_GT(tc)
- * 	Macro function to write check-expressions.
- * 	If expr1 is less than or euqal to expr2, the test-case will fail immediately.
- */
-#define NTS_REQUIRE_GT(tc, expr1, expr2) \
-	if (NTS_CHECK_GT(tc, expr1, expr2) == NTS_INVAL) \
-	{ \
-		NTS_INTERNAL_ACCESS(tc)->skip_next = 1; \
-	}
-
-/**
- * @def NTS_REQUIRE_GE(tc)
- * 	Macro function to write check-expressions.
- * 	If expr1 is less than expr2, the test-case will fail immediately.
- */
-#define NTS_REQUIRE_GE(tc, expr1, expr2) \
-	if (NTS_CHECK_GE(tc, expr1, expr2) == NTS_INVAL) \
+#define NTS_REQUIRE(tc, expr1, expr2, cond) \
+	if (NTS_CHECK(tc, expr1, expr2, cond) == NTS_INVAL) \
 	{ \
 		NTS_INTERNAL_ACCESS(tc)->skip_next = 1; \
 	}
