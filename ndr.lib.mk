@@ -21,7 +21,8 @@ $(EXTOBJS):
 	$(eval LNKLIST += $(wildcard  $(NBE_MK_OBJPATH)/$@/*.o))
 
 $(SRCS)::
-	@gcc -c $(SRCDIR)/$@ -I$(NBE_INCPATH) -I$(NBE_MK_INCPATH) $(CFLAGS) $(EXTRA_CFLAGS)
+	$(eval LIBDEFS += $(foreach LIBFLAG, $(LIBFLAGS), $(addprefix -D,$(LIBFLAG))))
+	@gcc -c $(SRCDIR)/$@ -I$(NBE_INCPATH) -I$(NBE_MK_INCPATH) $(CFLAGS) $(EXTRA_CFLAGS) $(LIBDEFS)
 	@cp -f $(basename $@).o $(NBE_MK_LOBJPATH)
 	$(eval LNKLIST += $(basename $@).o)
 
