@@ -26,7 +26,7 @@ $(SRCS)::
 	@cp -f $(basename $@).o $(NBE_MK_LOBJPATH)
 	$(eval LNKLIST += $(basename $@).o)
 
-$(INCS):
+$(INCS)::
 	@cp -f $(SRCDIR)/$@ $(NBE_INCPATH)
 
 lklib:
