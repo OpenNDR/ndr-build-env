@@ -40,6 +40,7 @@ M:  Hyeonho Seo <seohho@gmail.com>
 C:  build
 S:  Maintained
 F:  ndr.*
+X:  ndr.dpdk*
 
 == Build scripts ==
 M:  Hyeonho Seo <seohho@gmail.com>
@@ -47,8 +48,21 @@ C:  nbs
 S:  Maintained
 F:  ndr.build.script/
 
+== Build helpers ==
+M:  Hyeonho Seo <seohho@gmail.com>
+C:  nbh
+S:  Maintained
+F:  ndr.build.helper/
+
 == NDR test subcomponent ==
 M:  Hyeonho Seo <seohho@gmail.com>
 C:  nts
 S:  Maintained
 F:  ndr.test.subcomp/
+
+== DPDK supports ==
+M:  Hyeonho Seo <seohho@gmail.com>
+C:  dpdk
+S:  Maintained
+F:  ndr.dpdk*
+F:  ndr.dpdk.preset/

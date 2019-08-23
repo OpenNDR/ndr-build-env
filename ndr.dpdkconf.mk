@@ -16,7 +16,9 @@ please change the definition of the RTE_TARGET environment variable)
 endif
 
 include $(NBE_DIR)/ndr.dpdk.preset/dpdk.$(NBE_DPDK_VERSION).mk
-EXTRA_LDLIBS += $(DPDKLIBS)
-export EXTRA_LDLIBS
+include $(NBE_DIR)/ndr.build.helper/nbh.libsort.mk
+
+NBE_DPDKLIBS := $(call filter-libs,$(_DPDKLIBS-y))
+export NBE_DPDKLIBS
 
 endif
