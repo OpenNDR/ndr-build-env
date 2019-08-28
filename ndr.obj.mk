@@ -19,4 +19,4 @@ $(HDRS)::
 
 $(SRCS)::
 	@gcc -c $(SRCDIR)/$@ -I$(NBE_INCPATH) -I$(NBE_MK_INCPATH) $(CFLAGS) $(EXTRA_CFLAGS)
-	@cp -f $(basename $@).o $(NBE_MK_OBJPATH)/$(OBJ)/
+	@cp -f $(basename $@).o $(NBE_MK_OBJPATH)/$(OBJ)

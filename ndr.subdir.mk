@@ -8,7 +8,7 @@ build: $(DIRS)
 depset: $(DEPSET_DIRS)
 
 .PHONY: $(DIRS)
-$(DIRS):
+$(DIRS)::
 	@[ -d $(CURDIR)/$@ ] || mkdir -p $(CURDIR)/$@
 	@echo "== Build $S/$@"
 	@$(MAKE) S=$S/$@ -f $(SRCDIR)/$@/Makefile -C $(CURDIR)/$@ build

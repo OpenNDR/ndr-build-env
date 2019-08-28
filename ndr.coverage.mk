@@ -6,5 +6,5 @@ mkdir::
 	@[ -d $(NBE_COVPATH) ] || mkdir -p $(NBE_COVPATH)
 
 $(SRCS)::
-	@echo $@:$(SRCDIR):$(NBE_MK_COVPATH) >> $(NBE_LOG_PATHLOG)
+	@echo $@:$(SRCDIR)::$(NBE_MK_COVPATH) >> $(NBE_LOG_PATHLOG)
 	@cp -f $(SRCDIR)/$@ $(NBE_MK_COVPATH)

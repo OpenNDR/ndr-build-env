@@ -21,4 +21,4 @@ $(HDRS)::
 $(SRCS)::
 	@[ -d $(NBE_DPDKPATH) ] && cp -Lr $(NBE_DPDKPATH)/include/* $(NBE_MK_DPDKPATH)/.
 	@gcc -c $(SRCDIR)/$@ -I$(NBE_INCPATH) -I$(NBE_MK_DPDKPATH) -I$(NBE_MK_INCPATH) $(CFLAGS) $(EXTRA_CFLAGS)
-	@cp -f $(basename $@).o $(NBE_MK_OBJPATH)/$(OBJ)/
+	@cp -f $(basename $@).o $(NBE_MK_OBJPATH)/$(OBJ)

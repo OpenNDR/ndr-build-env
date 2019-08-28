@@ -10,14 +10,14 @@ mkdir::
 	@[ -d $(NBE_COVPATH) ] || mkdir -p $(NBE_COVPATH)
 	@[ -d $(NBE_COVPATH)/$(COVAPP) ] || mkdir -p $(NBE_COVPATH)/$(COVAPP)
 
-lcovlist:
+lcovlist::
 	$(eval LCOVLIST += $(foreach COVFILE, $(COVLIST), $(shell ls $(NBE_MK_COVPATH)/$(COVFILE).c 2>/dev/null)))
 	$(eval LCOVLIST += $(foreach COVFILE, $(COVLIST), $(shell ls $(NBE_MK_COVPATH)/$(COVFILE).cc 2>/dev/null)))
 
-lcovgen:
+lcovgen::
 	@echo $(LCOVLIST)
 	@lcov -c -d . -o $(COVAPP)_raw.lcov
 	@lcov -e $(COVAPP)_raw.lcov $(LCOVLIST) -o $(COVAPP).lcov
 
-lcovhtml:
+lcovhtml::
 	@genhtml -branch-coverage -o $(NBE_COVPATH)/$(COVAPP) $(COVAPP).lcov

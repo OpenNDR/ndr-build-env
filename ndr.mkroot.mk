@@ -34,11 +34,11 @@ clean:
 	@echo "Clean complete [$(PROJECT_NAME)]"
 
 .PHONY: $(RDIRS)
-$(RDIRS):
+$(RDIRS)::
 	@echo "== Build $@"
 	@$(MAKE) S=$@ -f $(NBE_ROOT)/$@/Makefile -C $(NBE_BUILDPATH)/$@ build
 
-%_depset:
+%_depset::
 	@[ -d $(NBE_OUTPUT)/$* ] || mkdir -p $(NBE_BUILDPATH)/$*
 	@echo "== Depset $*"
 	@$(MAKE) S=$* -f $(NBE_ROOT)/$*/Makefile depset

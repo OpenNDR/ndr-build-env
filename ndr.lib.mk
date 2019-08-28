@@ -17,8 +17,8 @@ $(HDRS)::
 	@echo $@:$(SRCDIR):$(NBE_MK_INCPATH) >> $(NBE_LOG_PATHLOG)
 	@cp -f $(SRCDIR)/$@ $(NBE_MK_INCPATH)
 
-$(EXTOBJS):
-	$(eval LNKLIST += $(wildcard  $(NBE_MK_OBJPATH)/$@/*.o))
+$(EXTOBJS)::
+	$(eval LNKLIST += $(wildcard $(NBE_MK_OBJPATH)/$@/*.o))
 
 $(SRCS)::
 	$(eval LIBDEFS += $(foreach LIBFLAG, $(LIBFLAGS), $(addprefix -D,$(LIBFLAG))))
@@ -29,5 +29,5 @@ $(SRCS)::
 $(INCS)::
 	@cp -f $(SRCDIR)/$@ $(NBE_INCPATH)
 
-lklib:
+lklib::
 	@ar rcs $(NBE_LIBPATH)/lib$(LIB).a $(LNKLIST)

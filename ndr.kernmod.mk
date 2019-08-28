@@ -16,7 +16,7 @@ SRCS_CC := $(SRCS_C:.cc=.o)
 $(KMOD)-objs := $(SRCS_CC) $(ASMS:.S=.o)
 
 .PHONY: build
-build: $(KEXTS) $(SRCS) mkkmod mvkmod
+build: $(KEXTS) mkkmod mvkmod
 
 .PHONY: depset
 depset: mkdir $(HDRS)
@@ -35,13 +35,11 @@ $(KEXTS)::
 	@[ -d $(NBE_MK_KBUILDPATH)/$(KMOD) ] || mkdir -p $(NBE_MK_KBUILDPATH)/$(KMOD)
 	@cp -f $(NBE_MK_KEXTPATH)/$@/* $(NBE_MK_KBUILDPATH)/$(KMOD)
 
-$(SRCS):: ;
-
-mkkmod:
+mkkmod::
 	@[ -d $(NBE_MK_KBUILDPATH)/$(KMOD) ] || mkdir -p $(NBE_MK_KBUILDPATH)/$(KMOD)
 	@cp -rf $(SRCDIR)/* $(NBE_MK_KBUILDPATH)/$(KMOD)
 	$(MAKE) -C $(KDIR) M=$(NBE_MK_KBUILDPATH)/$(KMOD) modules
 	@ln -s $(NBE_MK_KBUILDPATH)/$(KMOD) kbuilt-$(KMOD)
 
-mvkmod:
+mvkmod::
 	@mv -f $(NBE_MK_KBUILDPATH)/$(KMOD)/$(KMOD).ko $(NBE_KMODPATH)
