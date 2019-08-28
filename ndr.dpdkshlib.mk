@@ -38,5 +38,5 @@ lklib:
 	@[ -d $(NBE_DPDKPATH) ] && cp -Lr $(NBE_DPDKPATH)/lib/* $(NBE_MK_DPDKPATH)/.
 	@gcc -o lib$(SHLIB).so $(EXTLIST) $(SRCLIST) -L$(NBE_LIBPATH) -L$(NBE_MK_DPDKPATH) $(NBE_LIBS) $(NBE_DPDKLIBS) $(LIBLIST) -shared -fPIC -DPIC
 
-mvlib:
-	@mv -f lib$(SHLIB).so $(NBE_LIBPATH)
+cplib:
+	@cp -f lib$(SHLIB).so $(NBE_LIBPATH)

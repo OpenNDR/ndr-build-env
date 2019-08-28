@@ -2,7 +2,7 @@ SRCDIR := $(NBE_ROOT)/$S
 LDFLAGS += --as-needed -ldl
 
 .PHONY: build
-build: $(DEPLIBS) $(EXTOBJS) $(SRCS) lkapp mvapp
+build: $(DEPLIBS) $(EXTOBJS) $(SRCS) lkapp cpapp
 
 .PHONY: depset
 depset: mkdir $(HDRS)
@@ -36,5 +36,5 @@ lkapp::
 	@[ -d $(NBE_DPDKPATH) ] && cp -Lr $(NBE_DPDKPATH)/lib/* $(NBE_MK_DPDKPATH)/.
 	@gcc -o $(DPDKAPP).app $(EXTLIST) $(SRCLIST) -L$(NBE_LIBPATH) -L$(NBE_MK_DPDKPATH) $(NBE_LIBS) $(NBE_DPDKLIBS) $(LIBLIST)
 
-mvapp::
-	@mv -f $(DPDKAPP).app $(NBE_APPPATH)
+cpapp::
+	@cp -f $(DPDKAPP).app $(NBE_APPPATH)

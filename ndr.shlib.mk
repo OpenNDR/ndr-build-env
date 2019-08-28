@@ -35,5 +35,5 @@ $(INCS):
 lklib:
 	@gcc -o lib$(SHLIB).so $(EXTLIST) $(SRCLIST) -L$(NBE_LIBPATH) $(NBE_LIBS) $(LIBLIST) -shared -fPIC -DPIC
 
-mvlib:
-	@mv -f lib$(SHLIB).so $(NBE_LIBPATH)
+cplib:
+	@cp -f lib$(SHLIB).so $(NBE_LIBPATH)

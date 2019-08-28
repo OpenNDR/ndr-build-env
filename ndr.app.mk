@@ -2,7 +2,7 @@ SRCDIR := $(NBE_ROOT)/$S
 LDFLAGS += --as-needed -ldl
 
 .PHONY: build
-build: $(DEPLIBS) $(EXTOBJS) $(SRCS) lkapp mvapp
+build: $(DEPLIBS) $(EXTOBJS) $(SRCS) lkapp cpapp
 
 .PHONY: depset
 depset: mkdir $(HDRS)
@@ -33,5 +33,5 @@ $(SRCS)::
 lkapp::
 	@gcc -o $(APP).app $(EXTLIST) $(SRCLIST) -L$(NBE_LIBPATH) $(NBE_LIBS) $(LIBLIST)
 
-mvapp::
-	@mv -f $(APP).app $(NBE_APPPATH)
+cpapp::
+	@cp -f $(APP).app $(NBE_APPPATH)

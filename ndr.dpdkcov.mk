@@ -7,7 +7,7 @@ CFLAGS += -O0
 CFLAGS += -g
 
 .PHONY: build
-build: $(DEPLIBS) $(SRCS) buildlist buildtest gcovlist gcovgen gcovmv
+build: $(DEPLIBS) $(SRCS) buildlist buildtest gcovlist gcovgen gcovcp
 
 .PHONY: depset
 depset: mkdir $(HDRS)
@@ -45,11 +45,11 @@ gcovlist::
 	$(eval GCOVLIST += $(foreach COVFILE, $(COVLIST), $(shell ls $(NBE_MK_COVPATH)/$(COVFILE).cc 2>/dev/null)))
 
 gcovgen::
-	@mv -f $(COVAPP).app $(NBE_COVPATH)/$(COVAPP).app
+	@cp -f $(COVAPP).app $(NBE_COVPATH)/$(COVAPP).app
 	@./$(COVAPP)_cov $(TESTARGS) > $(COVAPP).result 2>&1
-	@mv -f $(COVAPP).result $(NBE_COVPATH)/$(COVAPP).result
+	@cp -f $(COVAPP).result $(NBE_COVPATH)/$(COVAPP).result
 	@gcov $(GCOVLIST) -o .
 
-gcovmv::
-	@mv -f $(foreach GCOVFILE, $(GCOVLIST), ./$(notdir $(GCOVFILE)).gcov) $(NBE_COVPATH)/$(COVAPP)
+gcovcp::
+	@cp -f $(foreach GCOVFILE, $(GCOVLIST), ./$(notdir $(GCOVFILE)).gcov) $(NBE_COVPATH)/$(COVAPP)
 	@$(NBE_SCRIPTS)/restore_source.sh $(NBE_LOG_PATHLOG) $(NBE_COVPATH)/$(COVAPP)
