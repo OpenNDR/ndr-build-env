@@ -17,6 +17,7 @@ lcovlist::
 lcovgen::
 	@echo $(LCOVLIST)
 	@lcov -c -d . -o $(COVAPP)_raw.lcov
+	@sed -i 's/-\([0-9]\+\)/\1/g' $(COVAPP)_raw.lcov
 	@lcov -e $(COVAPP)_raw.lcov $(LCOVLIST) -o $(COVAPP).lcov
 
 lcovhtml::
