@@ -8,14 +8,17 @@ EXTRA_CFLAGS += -I$(NBE_MK_INCPATH)
 obj-m := $(KMOD).o
 ifneq ($(origin KEXTS), undefined)
 	KEXT_DIRS += $(foreach KEXT_ITER, $(KEXTS), $(NBE_MK_KEXTPATH)/$(KEXT_ITER)/)
-	KEXT_SRCS += $(foreach KEXT_ITER, $(KEXT_DIRS), $(shell ls $(KEXT_ITER)))
-	SRCS_ORG := $(SRCS)
-	SRCS = $(KEXT_SRCS)
-	SRCS += $(SRCS_ORG)
+	KEXT_FILES += $(foreach KEXT_ITER, $(KEXT_DIRS), $(shell ls $(KEXT_ITER)))
+	FILES_ORG := $(SRCS)
+	FILES_ORG += $(ASMS)
+	FILES = $(KEXT_FILES)
+	FILES += $(FILES_ORG)
 endif
-SRCS_C := $(SRCS:.c=.o)
-SRCS_CC := $(SRCS_C:.cc=.o)
-$(KMOD)-objs := $(SRCS_CC) $(ASMS:.S=.o)
+SRCS_C := $(FILES:.c=.o)
+SRCS_CC := $(FILES:.cc=.o)
+ASMS_S := $(FILES:.s=.o)
+ASMS_ASM := $(FILES:.asm=.o)
+$(KMOD)-objs := $(SRCS_C) $(SRCS_CC) $(ASMS_S) $(ASMS_ASM)
 
 .PHONY: build
 build: $(KEXTS) mkkmod cpkmod
@@ -30,7 +33,6 @@ mkdir::
 	@[ -d $(NBE_KMODPATH) ] || mkdir -p $(NBE_KMODPATH)
 
 $(HDRS)::
-	@echo $@:$(SRCDIR):$(NBE_MK_INCPATH) >> $(NBE_LOG_PATHLOG)
 	@cp -f $(SRCDIR)/$@ $(NBE_MK_INCPATH)
 
 $(KEXTS)::
