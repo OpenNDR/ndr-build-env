@@ -1,3 +1,5 @@
+$(DPDKSHL) ?= $(NAME)
+
 SRCDIR := $(NBE_ROOT)/$S
 
 .PHONY: build
@@ -36,7 +38,7 @@ $(INCS):
 
 lklib:
 	@[ -d $(NBE_DPDKPATH) ] && cp -Lr $(NBE_DPDKPATH)/lib/* $(NBE_MK_DPDKPATH)/.
-	@gcc -o lib$(SHLIB).so $(EXTLIST) $(SRCLIST) -L$(NBE_LIBPATH) -L$(NBE_MK_DPDKPATH) $(NBE_LIBS) $(NBE_DPDKLIBS) $(LIBLIST) -shared -fPIC -DPIC
+	@gcc -o lib$(DPDKSHL).so $(EXTLIST) $(SRCLIST) -L$(NBE_LIBPATH) -L$(NBE_MK_DPDKPATH) $(NBE_LIBS) $(NBE_DPDKLIBS) $(LIBLIST) -shared -fPIC -DPIC
 
 cplib:
-	@cp -f lib$(SHLIB).so $(NBE_LIBPATH)
+	@cp -f lib$(DPDKSHL).so $(NBE_LIBPATH)

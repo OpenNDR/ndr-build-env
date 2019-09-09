@@ -1,3 +1,5 @@
+$(COVAPP) ?= $(NAME)
+
 SUBCOMP += test
 include $(NBE_DIR)/ndr.subcomp.mk
 

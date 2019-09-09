@@ -1,3 +1,5 @@
+$(OBJ) = $(NAME)
+
 SRCDIR := $(NBE_ROOT)/$S
 
 .PHONY: build

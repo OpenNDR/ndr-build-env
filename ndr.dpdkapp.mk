@@ -1,3 +1,5 @@
+$(DPDKAPP) ?= $(NAME)
+
 SRCDIR := $(NBE_ROOT)/$S
 LDFLAGS += --as-needed -ldl
 
@@ -37,4 +39,4 @@ lkapp::
 	@gcc -o $(DPDKAPP).app $(EXTLIST) $(SRCLIST) -L$(NBE_LIBPATH) -L$(NBE_MK_DPDKPATH) $(NBE_LIBS) $(NBE_DPDKLIBS) $(LIBLIST)
 
 cpapp::
-	@cp -f $(DPDKAPP).app $(NBE_APPPATH)
+	cp -f $(DPDKAPP).app $(NBE_APPPATH)
