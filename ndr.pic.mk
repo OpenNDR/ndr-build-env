@@ -16,8 +16,11 @@ mkdir::
 	@[ -d $(NBE_INCPATH) ] || mkdir -p $(NBE_INCPATH)
 
 $(HDRS)::
-	@echo $@:$(SRCDIR):$(NBE_MK_INCPATH) >> $(NBE_LOG_PATHLOG)
 	@cp -f $(SRCDIR)/$@ $(NBE_MK_INCPATH)
+
+$(ASMS)::
+	@gcc -c $(SRCDIR)/$@ -I$(NBE_INCPATH) -I$(NBE_MK_INCPATH) $(CFLAGS) $(EXTRA_CFLAGS)
+	@cp -f $(basename $@).o $(NBE_MK_PICPATH)/$(PIC)
 
 $(SRCS)::
 	@gcc -c $(SRCDIR)/$@ -I$(NBE_INCPATH) -I$(NBE_MK_INCPATH) $(CFLAGS) $(EXTRA_CFLAGS)

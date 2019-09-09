@@ -26,7 +26,7 @@ $(PICLIST)::
 	$(eval LNKLIST += $(wildcard $(NBE_MK_PICPATH)/$@/*.o))
 
 lkapp::
-	@gcc -o $(APP).app $(LNKLIST) $(SRCLIST) -L$(NBE_LIBPATH) $(NBE_LIBS) $(LIBFLAG)
+	@gcc -o $(APP).app $(LNKLIST) -L$(NBE_LIBPATH) $(NBE_LIBS) $(LIBFLAG)
 
 cpapp::
 	@cp -f $(APP).app $(NBE_APPPATH)

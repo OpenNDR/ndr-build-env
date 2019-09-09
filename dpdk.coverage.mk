@@ -1,5 +1,8 @@
 COVERAGE ?= $(NAME)
 
+SUBCOMP += test
+include $(NBE_DIR)/ndr.subcomp.mk
+
 SRCDIR := $(NBE_ROOT)/$S
 LDFLAGS += --as-needed -ldl
 CFLAGS += -O0
@@ -15,6 +18,7 @@ mkdir::
 	@[ -d $(NBE_MK_COVPATH) ] || mkdir -p $(NBE_MK_COVPATH)
 	@[ -d $(NBE_MK_COVPATH)/$(COVERAGE) ] || mkdir -p $(NBE_MK_COVPATH)/$(COVERAGE)
 	@[ -d $(NBE_COVPATH) ] || mkdir -p $(NBE_COVPATH)
+	@[ -d $(NBE_MK_DPDKPATH) ] || mkdir -p $(NBE_MK_DPDKPATH)
 
 $(LIBLIST)::
 	$(eval LIBLIST += $(addprefix -l,$@))
@@ -32,8 +36,9 @@ $(COVLIST)::
 	@cp -f $(NBE_MK_COVPATH)/$@/*.gcno .
 
 linktest::
-	@gcc -o $(COVERAGE).app $(LNKLIST) -L$(NBE_LIBPATH) $(NBE_LIBS) $(LIBLIST) $(CFLAGS) $(EXTRA_CFLAGS)
-	@gcc -o $(COVERAGE)_cov $(COVLNKS) -L$(NBE_LIBPATH) $(LIBLIST) $(NBE_LIBS) $(CFLAGS) $(EXTRA_CFLAGS) -lgcov
+	@[ -d $(NBE_DPDKPATH) ] && cp -Lr $(NBE_DPDKPATH)/lib/* $(NBE_MK_DPDKPATH)/.
+	@gcc -o $(COVERAGE).app $(LNKLIST) -L$(NBE_LIBPATH) -L$(NBE_MK_DPDKPATH) $(NBE_LIBS) $(NBE_DPDKLIBS) $(LIBLIST) $(CFLAGS) $(EXTRA_CFLAGS)
+	@gcc -o $(COVERAGE)_cov $(COVLNKS) -L$(NBE_LIBPATH) -L$(NBE_MK_DPDKPATH) $(NBE_LIBS) $(NBE_DPDKLIBS) $(LIBLIST) $(CFLAGS) $(EXTRA_CFLAGS) -lgcov
 
 gcovgen::
 	@cp -f $(COVERAGE).app $(NBE_COVPATH)/$(COVERAGE).app
@@ -46,4 +51,4 @@ gcovgen::
 
 gcovcp::
 	@cp -f $(foreach COVFILE, $(COVFILES), ./$(notdir $(COVFILE)).gcov) $(NBE_COVPATH)/$(COVERAGE)
-	@$(NBE_SCRIPTS)/nbs.recover.sh $(NBE_PATHLOG_RESTORE) $(NBE_COVPATH)/$(COVERAGE)
+	@$(NBE_SCRIPTS)/nbs.restore.path $(NBE_PATHLOG_RESTORE) $(NBE_COVPATH)/$(COVERAGE)

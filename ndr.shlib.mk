@@ -27,7 +27,7 @@ $(INCS):
 	@cp -f $(SRCDIR)/$@ $(NBE_INCPATH)
 
 lklib:
-	@gcc -o lib$(SHLIB).so $(LNKLIST) $(SRCLIST) -L$(NBE_LIBPATH) $(NBE_LIBS) $(LIBFLAG) -shared
+	@gcc -o lib$(SHLIB).so $(LNKLIST) -L$(NBE_LIBPATH) $(NBE_LIBS) $(LIBFLAG) -shared
 
 cplib:
 	@cp -f lib$(SHLIB).so $(NBE_LIBPATH)

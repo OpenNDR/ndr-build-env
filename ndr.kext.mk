@@ -16,8 +16,10 @@ mkdir::
 	@[ -d $(NBE_INCPATH) ] || mkdir -p $(NBE_INCPATH)
 
 $(HDRS)::
-	@echo $@:$(SRCDIR):$(NBE_MK_INCPATH) >> $(NBE_LOG_PATHLOG)
 	@cp -f $(SRCDIR)/$@ $(NBE_MK_INCPATH)
+
+$(ASMS)::
+	@cp -f $(SRCDIR)/$@ $(NBE_MK_KEXTPATH)/$(KEXT)/
 
 $(SRCS)::
 	@cp -f $(SRCDIR)/$@ $(NBE_MK_KEXTPATH)/$(KEXT)/
