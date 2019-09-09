@@ -4,36 +4,29 @@ SRCDIR := $(NBE_ROOT)/$S
 LDFLAGS += --as-needed -ldl
 
 .PHONY: build
-build: $(DEPLIBS) $(EXTOBJS) $(SRCS) lkapp cpapp
+build: $(LIBLIST) $(OBJLIST) $(PICLIST) lkapp cpapp
 
 .PHONY: depset
 depset: mkdir $(HDRS)
 
 mkdir::
 	#Output directories pre-init
-	@[ -d $(NBE_MK_INCPATH) ] || mkdir -p $(NBE_MK_INCPATH)
 	@[ -d $(NBE_MK_OBJPATH) ] || mkdir -p $(NBE_MK_OBJPATH)
 	@[ -d $(NBE_INCPATH) ] || mkdir -p $(NBE_INCPATH)
 	@[ -d $(NBE_LIBPATH) ] || mkdir -p $(NBE_LIBPATH)
 	@[ -d $(NBE_APPPATH) ] || mkdir -p $(NBE_APPPATH)
 
-$(HDRS)::
-	@echo $@:$(SRCDIR):$(NBE_MK_INCPATH) >> $(NBE_LOG_PATHLOG)
-	@cp -f $(SRCDIR)/$@ $(NBE_MK_INCPATH)
+$(LIBLIST)::
+	$(eval LIBFLAG += $(addprefix -l,$@))
 
-$(DEPLIBS)::
-	$(eval LIBLIST += $(addprefix -l,$@))
+$(OBJLIST)::
+	$(eval LNKLIST += $(wildcard $(NBE_MK_OBJPATH)/$@/*.o))
 
-$(EXTOBJS)::
-	$(eval EXTLIST += $(wildcard $(NBE_MK_OBJPATH)/$@/*.o))
-
-$(SRCS)::
-	@gcc -c $(SRCDIR)/$@ -I$(NBE_INCPATH) -I$(NBE_MK_INCPATH) $(CFLAGS) $(EXTRA_CFLAGS)
-	@cp -f $(basename $@).o $(NBE_MK_OBJPATH)
-	$(eval SRCLIST += $(basename $@).o)
+$(PICLIST)::
+	$(eval LNKLIST += $(wildcard $(NBE_MK_PICPATH)/$@/*.o))
 
 lkapp::
-	@gcc -o $(APP).app $(EXTLIST) $(SRCLIST) -L$(NBE_LIBPATH) $(NBE_LIBS) $(LIBLIST)
+	@gcc -o $(APP).app $(LNKLIST) $(SRCLIST) -L$(NBE_LIBPATH) $(NBE_LIBS) $(LIBFLAG)
 
 cpapp::
 	@cp -f $(APP).app $(NBE_APPPATH)

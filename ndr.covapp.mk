@@ -9,7 +9,7 @@ CFLAGS += -O0
 CFLAGS += -g
 
 .PHONY: build
-build: $(DEPLIBS) $(SRCS) buildlist buildtest gcovlist gcovgen gcovcp
+build: $(LIBLIST) $(SRCS) buildlist buildtest gcovlist gcovgen gcovcp
 
 .PHONY: depset
 depset: mkdir $(HDRS)
@@ -22,7 +22,7 @@ $(HDRS)::
 	@echo $@:$(SRCDIR):$(NBE_MK_INCPATH) >> $(NBE_LOG_PATHLOG)
 	@cp -f $(SRCDIR)/$@ $(NBE_MK_INCPATH)
 
-$(DEPLIBS)::
+$(LIBLIST)::
 	$(eval LIBLIST += $(addprefix -l,$@))
 
 $(SRCS)::
