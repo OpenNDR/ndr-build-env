@@ -1,3 +1,5 @@
+DPDKOBJ ?= $(NAME)
+
 SRCDIR := $(NBE_ROOT)/$S
 
 .PHONY: build
@@ -11,7 +13,7 @@ mkdir::
 	@[ -d $(NBE_MK_INCPATH) ] || mkdir -p $(NBE_MK_INCPATH)
 	@[ -d $(NBE_MK_OBJPATH) ] || mkdir -p $(NBE_MK_OBJPATH)
 	@[ -d $(NBE_MK_DPDKPATH) ] || mkdir -p $(NBE_MK_DPDKPATH)
-	@[ -d $(NBE_MK_OBJPATH)/$(OBJ) ] || mkdir -p $(NBE_MK_OBJPATH)/$(OBJ)
+	@[ -d $(NBE_MK_OBJPATH)/$(DPDKOBJ) ] || mkdir -p $(NBE_MK_OBJPATH)/$(DPDKOBJ)
 	@[ -d $(NBE_INCPATH) ] || mkdir -p $(NBE_INCPATH)
 
 $(HDRS)::
@@ -21,4 +23,4 @@ $(HDRS)::
 $(SRCS)::
 	@[ -d $(NBE_DPDKPATH) ] && cp -Lr $(NBE_DPDKPATH)/include/* $(NBE_MK_DPDKPATH)/.
 	@gcc -c $(SRCDIR)/$@ -I$(NBE_INCPATH) -I$(NBE_MK_DPDKPATH) -I$(NBE_MK_INCPATH) $(CFLAGS) $(EXTRA_CFLAGS)
-	@cp -f $(basename $@).o $(NBE_MK_OBJPATH)/$(OBJ)
+	@cp -f $(basename $@).o $(NBE_MK_OBJPATH)/$(DPDKOBJ)

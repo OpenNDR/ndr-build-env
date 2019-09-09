@@ -1,3 +1,5 @@
+APP ?= $(NAME)
+
 SRCDIR := $(NBE_ROOT)/$S
 LDFLAGS += --as-needed -ldl
 

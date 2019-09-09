@@ -1,3 +1,5 @@
+KMOD ?= $(NAME)
+
 SRCDIR := $(NBE_ROOT)/$S
 
 KVER ?= $(shell uname -r)
