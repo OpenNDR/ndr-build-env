@@ -8,28 +8,28 @@ build: $(LIBLIST) $(OBJLIST) $(PICLIST) $(INCS) lklib
 .PHONY: depset
 depset: mkdir $(HDRS)
 
-mkdir:
+mkdir::
 	#Output directories pre-init
 	@[ -d $(NBE_MK_INCPATH) ] || mkdir -p $(NBE_MK_INCPATH)
 	@[ -d $(NBE_MK_DPDKPATH) ] || mkdir -p $(NBE_MK_DPDKPATH)
 	@[ -d $(NBE_INCPATH) ] || mkdir -p $(NBE_INCPATH)
 	@[ -d $(NBE_LIBPATH) ] || mkdir -p $(NBE_LIBPATH)
 
-$(LIBLIST):
+$(LIBLIST)::
 	$(eval LIBFLAG += $(addprefix -l,$@))
 
-$(OBJLIST):
+$(OBJLIST)::
 	$(eval LNKLIST += $(wildcard $(NBE_MK_OBJPATH)/$@/*.o))
 
 $(PICLIST)::
 	$(eval LNKLIST += $(wildcard $(NBE_MK_PICPATH)/$@/*.o))
 
-$(INCS):
+$(INCS)::
 	@cp -f $(SRCDIR)/$@ $(NBE_INCPATH)
 
-lklib:
+lklib::
 	@[ -d $(NBE_DPDKPATH) ] && cp -Lr $(NBE_DPDKPATH)/lib/* $(NBE_MK_DPDKPATH)/.
 	@gcc -o lib$(SHLIB).so $(LNKLIST) -L$(NBE_LIBPATH) -L$(NBE_MK_DPDKPATH) $(NBE_LIBS) $(NBE_DPDKLIBS) $(LIBFLAG) -shared
 
-cplib:
+cplib::
 	@cp -f lib$(SHLIB).so $(NBE_LIBPATH)
