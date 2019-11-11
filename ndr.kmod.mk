@@ -6,19 +6,21 @@ KVER ?= $(shell uname -r)
 KDIR := /lib/modules/$(KVER)/build
 EXTRA_CFLAGS += -I$(NBE_MK_INCPATH)
 obj-m := $(KMOD).o
+FILES_ORG := $(SRCS)
+FILES_ORG += $(ASMS)
+FILES :=
 ifneq ($(origin KEXTS), undefined)
 	KEXT_DIRS += $(foreach KEXT_ITER, $(KEXTS), $(NBE_MK_KEXTPATH)/$(KEXT_ITER)/)
 	KEXT_FILES += $(foreach KEXT_ITER, $(KEXT_DIRS), $(shell ls $(KEXT_ITER)))
-	FILES_ORG := $(SRCS)
-	FILES_ORG += $(ASMS)
-	FILES = $(KEXT_FILES)
-	FILES += $(FILES_ORG)
+	FILES += $(KEXT_FILES)
 endif
-SRCS_C := $(FILES:.c=.o)
-SRCS_CC := $(FILES:.cc=.o)
-ASMS_S := $(FILES:.s=.o)
-ASMS_ASM := $(FILES:.asm=.o)
-$(KMOD)-objs := $(SRCS_C) $(SRCS_CC) $(ASMS_S) $(ASMS_ASM)
+FILES += $(FILES_ORG)
+FILES := $(FILES:.c=.o)
+FILES := $(FILES:.cc=.o)
+FILES := $(FILES:.s=.o)
+FILES := $(FILES:.asm=.o)
+
+$(KMOD)-objs := $(FILES)
 
 .PHONY: build
 build: $(KEXTS) mkkmod cpkmod
