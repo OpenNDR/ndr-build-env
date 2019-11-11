@@ -46,4 +46,4 @@ gcovgen::
 
 gcovcp::
 	@cp -f $(foreach COVFILE, $(COVFILES), ./$(notdir $(COVFILE)).gcov) $(NBE_COVPATH)/$(COVERAGE)
-	@$(NBE_SCRIPTS)/nbs.recover.sh $(NBE_PATHLOG_RESTORE) $(NBE_COVPATH)/$(COVERAGE)
+	@$(NBE_SCRIPTS)/nbs.restore.path $(NBE_PATHLOG_RESTORE) $(NBE_COVPATH)/$(COVERAGE)
